@@ -1,12 +1,10 @@
 variable "name" {}
 variable "ami" {}
 variable "instance_type" {}
-variable "count" {}
 variable "key_name" {}
-variable "subnet_ids" {}
+variable "subnet_id" {}
+variable "azs" {}
 variable "vpc_cidr" {}
 variable "vpc_id" {}
-variable "vpc_peering_cidr" {}
-variable "iam_instance_profile_name" {}
 variable "consul_server_version" {}
 variable "consul_cluster_size" {}

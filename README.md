@@ -20,3 +20,24 @@ Here's our architecture:
 ```
 
 I also ended up making a simple VPC config that creates a new VPC, a public and a private subnet, an internet gateway, and a routing table.
+
+
+
+## Instructions
+
+### AWS Setup
+
+1. Create AWS Account, Log into AWS
+1. Create + download a keypair in AWS EC2
+1. `mv Downloads/tutorialinux.pem ./keys`
+1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in provider.tf
+1. mv provider.tf infrastructure/
+
+
+### Network Setup
+
+1. `cd $THIS_REPOSITORY/infrastructure`
+1. `terraform init`
+1. `terraform plan`
+
+

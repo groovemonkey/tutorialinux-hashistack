@@ -5,21 +5,23 @@
 ###############################
 resource "aws_instance" "consul" {
   ami                     = "${var.ami}"
-  count                   = "${var.count}"
+  count                   = "${var.consul_cluster_size}"
   instance_type           = "${var.instance_type}"
   key_name                = "${var.key_name}"
 
   # A bit of extra cleverness -- this will only work if you have a 3-node cluster
   # You can make this highly available by having 3 subnets (one in each of your region's Availability Zones) and then doing
-  # subnet_id = subnet_ids[count % len(subnet_ids)]
+  # availability_zone = var.azs[count.index % len(azs)]
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
-  subnet_id               = "${element(split(",", var.subnet_ids), count.index)}"
+  availability_zone       = "${element(split(",", var.azs), count.index)}"
+  subnet_id               = "${var.subnet_id}"
 
-  iam_instance_profile    = "${var.iam_instance_profile_name}"
+
+  iam_instance_profile    = "${aws_iam_instance_profile.consul}"
   user_data               = "${data.template_file.consul_server_userdata.rendered}"
   vpc_security_group_ids  = ["${aws_security_group.consul.id}"]
 
-  tags {
+  tags = {
     Name = "consul-server-${count.index}"
     role = "consul-server"
   }
@@ -30,9 +32,10 @@ resource "aws_instance" "consul" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.consul_systemd_servicefile.rendered}"
+    content     = "${file("${path.module}/config/consul-systemd-service.conf")}"
     destination = "/etc/systemd/system/consul.service"
   }
+
 
   # Might not be needed, if the cloud-init.target works
   # provisioner "remote-exec" {
@@ -48,22 +51,17 @@ resource "aws_instance" "consul" {
 ####################################################
 data "template_file" "consul_server_userdata" {
   template = "${file("${path.module}/config/consul-userdata.sh.tpl")}"
-  vars {
+  vars = {
     CONSUL_VERSION = "${var.consul_server_version}"
   }
 }
 
 data "template_file" "consul_server_config" {
   template = "${file("${path.module}/config/consul-server.json.tpl")}"
-  vars {
+  vars = {
     CONSUL_COUNT = "${var.consul_cluster_size}"
   }
 }
-
-data "template_file" "consul_systemd_servicefile" {
-  template = "${file("${path.module}/config/consul-systemd-service.conf.tpl")}"
-}
-
 
 ####################################################
 # A security group for our consul-server instances #

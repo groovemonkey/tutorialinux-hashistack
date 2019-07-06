@@ -9,10 +9,9 @@ module "consul" {
   azs                       = "us-west-2a,us-west-2b,us-west-2c"
   consul_cluster_size       = 3
 
-  key_name                  = "${var.key_name}"
-  name                      = "${var.name}-consul"
-  subnet_ids                = "${aws_subnet.private}"
+  key_name                  = "tutorialinux"
+  name                      = "tutorialinux-consul"
+  subnet_id                 = "${aws_subnet.private}"
   vpc_id                    = "${aws_vpc.tutorialinux.id}"
-  vpc_cidr                  = "${aws_vpc.tutorialinux.cidr}"
-  iam_instance_profile_name = "${aws_iam_instance_profile.consul}"
+  vpc_cidr                  = "${aws_vpc.tutorialinux.cidr_block}"
 }
