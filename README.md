@@ -12,7 +12,11 @@ It covers setting up a consul cluster, running in AWS, which
 
 Here's our architecture:
 
+```
 [nginx] --> uses consul-template to render something from the consul KV store
    |
    |
 (consul) - (consul) - (consul) --> a 3-node consul cluster
+```
+
+I also ended up making a simple VPC config that creates a new VPC, a public and a private subnet, an internet gateway, and a routing table.
