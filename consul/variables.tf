@@ -1,0 +1,10 @@
+variable "name" {}
+variable "ami" {}
+variable "instance_type" {}
+variable "count" {}
+variable "key_name" {}
+variable "subnet_ids" {}
+variable "vpc_cidr" {}
+variable "vpc_id" {}
+variable "vpc_peering_cidr" {}
+variable "iam_instance_profile_name" {}

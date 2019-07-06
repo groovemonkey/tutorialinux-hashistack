@@ -1,0 +1,3 @@
+keys/credentials.sh
+terraform.tfstate*
+.terraform
