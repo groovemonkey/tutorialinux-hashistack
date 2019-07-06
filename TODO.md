@@ -10,7 +10,6 @@ Basic Setup Readme
 Network
 - test network setup
 
-
 Consul:
 - test basic config
 - am I mixing normal resources and modules correctly?

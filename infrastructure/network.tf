@@ -13,9 +13,6 @@ variable "public_subnet_cidr" {
   default = "10.0.10.0/24"
 }
 
-variable "name" {}
-
-
 ################
 # Create a VPC #
 ################

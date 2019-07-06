@@ -32,14 +32,14 @@ resource "aws_instance" "consul" {
 data "template_file" "consul_server_userdata" {
   template = "${file("${path.module}/config/consul-userdata.sh.tpl")}"
   vars {
-    CONSUL_VERSION = "1.5.2"
+    CONSUL_VERSION = "${var.consul_server_version}"
   }
 }
 
 data "template_file" "consul_server_config" {
   template = "${file("${path.module}/config/consul-server.json.tpl")}"
   vars {
-    CONSUL_COUNT = 3
+    CONSUL_COUNT = "${var.consul_cluster_size}"
   }
 }
 
