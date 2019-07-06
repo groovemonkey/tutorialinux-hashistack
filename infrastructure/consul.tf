@@ -11,7 +11,7 @@ module "consul" {
 
   key_name                  = "tutorialinux"
   name                      = "tutorialinux-consul"
-  subnet_id                 = "${aws_subnet.private}"
+  subnet_id                 = "${aws_subnet.private.id}"
   vpc_id                    = "${aws_vpc.tutorialinux.id}"
   vpc_cidr                  = "${aws_vpc.tutorialinux.cidr_block}"
 }

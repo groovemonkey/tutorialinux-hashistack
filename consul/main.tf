@@ -17,7 +17,7 @@ resource "aws_instance" "consul" {
   subnet_id               = "${var.subnet_id}"
 
 
-  iam_instance_profile    = "${aws_iam_instance_profile.consul}"
+  iam_instance_profile    = "${aws_iam_instance_profile.consul.name}"
   user_data               = "${data.template_file.consul_server_userdata.rendered}"
   vpc_security_group_ids  = ["${aws_security_group.consul.id}"]
 
