@@ -10,7 +10,7 @@ resource "aws_instance" "consul" {
   key_name                = "${var.key_name}"
 
   # A bit of extra cleverness -- this will only work if you have a 3-node cluster
-  # You can add resilence via cleverness by doing
+  # You can make this highly available by having 3 subnets (one in each of your region's Availability Zones) and then doing
   # subnet_id = subnet_ids[count % len(subnet_ids)]
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
   subnet_id               = "${element(split(",", var.subnet_ids), count.index)}"
