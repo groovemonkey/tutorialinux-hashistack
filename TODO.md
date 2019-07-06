@@ -16,8 +16,13 @@ Consul:
 - am I mixing normal resources and modules correctly?
 
 Web Servers:
-- install nginx
-- download and install consul-template
-- feed in consul template file via a provisioner
 - register nginx service with consul on startup (systemd unit file -- postexec?)
 
+
+Later:
+create variables.tf file for infrastructure/:
+- ami should be a base_ami variable
+- key_name should be a var
+- abstract cloud-autojoin tag + value into a var, and use everywhere
+
+- install consul and consul-template via pacman -- the latest versions are in the community repo

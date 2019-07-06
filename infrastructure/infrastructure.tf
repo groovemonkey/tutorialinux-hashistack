@@ -15,3 +15,14 @@ module "consul" {
   vpc_id                    = "${aws_vpc.tutorialinux.id}"
   vpc_cidr                  = "${aws_vpc.tutorialinux.cidr_block}"
 }
+
+module "nginx" {
+  source = "../nginx"
+  ami                       = "ami-0f0ddbdc490ad09fd"
+  nginx_pool_size           = 1
+  consul_version            = "1.5.2"
+  instance_type             = "t2.micro"
+  key_name                  = "tutorialinux"
+  subnet_id                 = "${aws_subnet.public.id}"
+  vpc_id                    = "${aws_vpc.tutorialinux.id}"
+}

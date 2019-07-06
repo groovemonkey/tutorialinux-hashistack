@@ -28,7 +28,7 @@ resource "aws_instance" "consul" {
 
   provisioner "file" {
     content     = "${data.template_file.consul_server_config.rendered}"
-    destination = "/etc/consul.d/server.json"
+    destination = "/usr/local/etc/consul/server.json"
   }
 
   provisioner "file" {
@@ -36,13 +36,11 @@ resource "aws_instance" "consul" {
     destination = "/etc/systemd/system/consul.service"
   }
 
-
-  # Might not be needed, if the cloud-init.target works
-  # provisioner "remote-exec" {
-  #     inline = [
-  #       "service consul start"
-  #     ]
-  # }
+  provisioner "remote-exec" {
+      inline = [
+        "systemctl daemon-reload"
+      ]
+  }
 }
 
 
