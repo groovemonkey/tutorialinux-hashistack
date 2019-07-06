@@ -5,7 +5,6 @@ module "consul" {
   ami                       = "ami-0f0ddbdc490ad09fd"
   consul_server_version     = "1.5.2"
   instance_type             = "t2.micro"
-
   azs                       = "us-west-2a,us-west-2b,us-west-2c"
   consul_cluster_size       = 3
 

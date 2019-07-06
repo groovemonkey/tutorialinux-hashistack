@@ -15,31 +15,53 @@ resource "aws_instance" "consul" {
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
   availability_zone       = "${element(split(",", var.azs), count.index)}"
   subnet_id               = "${var.subnet_id}"
-
-
   iam_instance_profile    = "${aws_iam_instance_profile.consul.name}"
   user_data               = "${data.template_file.consul_server_userdata.rendered}"
   vpc_security_group_ids  = ["${aws_security_group.consul.id}"]
 
   tags = {
-    Name = "consul-server-${count.index}"
-    role = "consul-server"
+    Name                  = "consul-server-${count.index}"
+    role                  = "consul-server"
   }
 
   provisioner "file" {
-    content     = "${data.template_file.consul_server_config.rendered}"
-    destination = "/usr/local/etc/consul/server.json"
+    content               = "${data.template_file.consul_server_config.rendered}"
+    destination           = "/usr/local/etc/consul/server.json"
+    # We're jumping through the nginx host to SSH to these
+    # https://www.terraform.io/docs/provisioners/connection.html
+    connection {
+      host                = "${self.private_ip}"
+      user                = "root"
+      private_key         = "${file("../keys/tutorialinux.pem")}"
+      bastion_host        = "${aws_instance.bastion}"
+    }
   }
 
   provisioner "file" {
-    content     = "${file("${path.module}/config/consul-systemd-service.conf")}"
-    destination = "/etc/systemd/system/consul.service"
+    content               = "${file("${path.module}/config/consul-systemd-service.conf")}"
+    destination           = "/etc/systemd/system/consul.service"
+    # We're jumping through the nginx host to SSH to these
+    # https://www.terraform.io/docs/provisioners/connection.html
+    connection {
+      host                = "${self.private_ip}"
+      user                = "root"
+      private_key         = "${file("../keys/tutorialinux.pem")}"
+      bastion_host        = "${aws_instance.bastion}"
+    }
   }
 
   provisioner "remote-exec" {
       inline = [
         "systemctl daemon-reload"
       ]
+      # We're jumping through the nginx host to SSH to these
+      # https://www.terraform.io/docs/provisioners/connection.html
+      connection {
+        host              = "${self.private_ip}"
+        user              = "root"
+        private_key       = "${file("../keys/tutorialinux.pem")}"
+        bastion_host      = "${aws_instance.bastion}"
+      }
   }
 }
 
@@ -78,7 +100,13 @@ resource "aws_security_group" "consul" {
 
   # DNS
   ingress {
-    protocol    = -1
+    protocol    = "tcp"
+    from_port   = 8600
+    to_port     = 8600
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+  ingress {
+    protocol    = "udp"
     from_port   = 8600
     to_port     = 8600
     cidr_blocks = ["${var.vpc_cidr}"]
@@ -86,12 +114,19 @@ resource "aws_security_group" "consul" {
 
   # LAN Serf
   ingress {
-    protocol    = -1
+    protocol    = "tcp"
+    from_port   = 8301
+    to_port     = 8301
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+  ingress {
+    protocol    = "udp"
     from_port   = 8301
     to_port     = 8301
     cidr_blocks = ["${var.vpc_cidr}"]
   }
 
+  # Allow SSH from inside our VPC
   ingress {
     protocol    = "tcp"
     from_port   = 22
@@ -123,7 +158,7 @@ resource "aws_iam_role_policy" "consul-server" {
 {
     "Statement": [
         {
-            "Sid": "consul-autojoin",
+            "Sid": "consulautojoin",
             "Effect": "Allow",
             "Action": [
                 "ec2:DescribeInstances"

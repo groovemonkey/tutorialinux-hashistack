@@ -34,10 +34,17 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 1. mv provider.tf infrastructure/
 
 
-### Network Setup
+### Infrastructure Creation
 
 1. `cd $THIS_REPOSITORY/infrastructure`
 1. `terraform init`
 1. `terraform plan`
+1. `terraform apply`
 
+
+### Log in to your instances
+
+Use whatever key you created/downloaded for your terraform IAM user (above):
+
+```ssh root@$INSTANCE_IP -i keys/tutorialinux.pem```
 
