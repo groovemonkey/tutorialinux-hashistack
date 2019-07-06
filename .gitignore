@@ -1,4 +1,4 @@
-keys/credentials.sh
+keys/*
 terraform.tfstate*
 .terraform
-provider.tf
+/provider.tf
