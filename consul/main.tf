@@ -16,19 +16,36 @@ resource "aws_instance" "consul" {
   subnet_id               = "${element(split(",", var.subnet_ids), count.index)}"
 
   iam_instance_profile    = "${var.iam_instance_profile_name}"
-  user_data               = "${file("${path.module}/config/consul-userdata.sh")}"
+  user_data               = "${data.template_file.consul_server_userdata.rendered}"
   vpc_security_group_ids  = ["${aws_security_group.consul.id}"]
 
   tags {
     Name = "consul-server-${count.index}"
     role = "consul-server"
   }
+
+  provisioner "file" {
+    content     = "${data.template_file.consul_server_config.rendered}"
+    destination = "/etc/consul.d/server.json"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.consul_systemd_servicefile.rendered}"
+    destination = "/etc/systemd/system/consul.service"
+  }
+
+  # Might not be needed, if the cloud-init.target works
+  # provisioner "remote-exec" {
+  #     inline = [
+  #       "service consul start"
+  #     ]
+  # }
 }
 
 
-###############################################
-# consul-servers are configured via user-data #
-###############################################
+####################################################
+# consul-servers are configured via template files #
+####################################################
 data "template_file" "consul_server_userdata" {
   template = "${file("${path.module}/config/consul-userdata.sh.tpl")}"
   vars {
@@ -43,7 +60,6 @@ data "template_file" "consul_server_config" {
   }
 }
 
-# And a template file...
 data "template_file" "consul_systemd_servicefile" {
   template = "${file("${path.module}/config/consul-systemd-service.conf.tpl")}"
 }
@@ -56,10 +72,34 @@ resource "aws_security_group" "consul" {
   name   = "${var.name}"
   vpc_id = "${var.vpc_id}"
 
+  # HTTP API
+  ingress {
+    protocol    = "TCP"
+    from_port   = 8500
+    to_port     = 8500
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+
+  # DNS
   ingress {
     protocol    = -1
-    from_port   = 0
-    to_port     = 0
+    from_port   = 8600
+    to_port     = 8600
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+
+  # LAN Serf
+  ingress {
+    protocol    = -1
+    from_port   = 8301
+    to_port     = 8301
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["${var.vpc_cidr}"]
   }
 
