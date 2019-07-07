@@ -7,8 +7,6 @@ Basic Setup Readme
 - run terraform
 
 
-Network
-- test network setup
 
 Consul:
 - bastion box? Or provision nginx server at the same time and use it as a bounce host?
@@ -16,13 +14,20 @@ Consul:
 - am I mixing normal resources and modules correctly?
 
 Web Servers:
+- lock down -- should also only be accessible from bastion's IP, just like consul
 - register nginx service with consul on startup (systemd unit file -- postexec?)
+
+Bastion:
+- install sshguard
 
 
 Later:
+- separate bastion into its own module?
+
 create variables.tf file for infrastructure/:
 - ami should be a base_ami variable
 - key_name should be a var
 - abstract cloud-autojoin tag + value into a var, and use everywhere
 
 - install consul and consul-template via pacman -- the latest versions are in the community repo
+

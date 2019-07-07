@@ -9,11 +9,13 @@ resource "aws_instance" "consul" {
   instance_type           = "${var.instance_type}"
   key_name                = "${var.key_name}"
 
-  # A bit of extra cleverness -- this will only work if you have a 3-node cluster
-  # You can make this highly available by having 3 subnets (one in each of your region's Availability Zones) and then doing
-  # availability_zone = var.azs[count.index % len(azs)]
+  # A bit of extra cleverness if you have multiple subnets in different AZs:
+  #   You can make this highly available by having 3 subnets (one in each of your region's Availability Zones) and then doing
+  #
+  #   availability_zone = var.azs[count.index % len(azs)]
+  #
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
-  availability_zone       = "${element(split(",", var.azs), count.index)}"
+  # availability_zone       = "${element(split(",", var.azs), count.index)}"
   subnet_id               = "${var.subnet_id}"
   iam_instance_profile    = "${aws_iam_instance_profile.consul.name}"
   user_data               = "${data.template_file.consul_server_userdata.rendered}"
@@ -22,6 +24,20 @@ resource "aws_instance" "consul" {
   tags = {
     Name                  = "consul-server-${count.index}"
     role                  = "consul-server"
+  }
+
+  provisioner "remote-exec" {
+      inline = [
+        "mkdir /usr/local/etc/consul"
+      ]
+      # We're jumping through the nginx host to SSH to these
+      # https://www.terraform.io/docs/provisioners/connection.html
+      connection {
+        host              = "${self.private_ip}"
+        user              = "root"
+        private_key       = "${file("../keys/tutorialinux.pem")}"
+        bastion_host      = "${var.bastion_connect}"
+      }
   }
 
   provisioner "file" {
@@ -33,7 +49,7 @@ resource "aws_instance" "consul" {
       host                = "${self.private_ip}"
       user                = "root"
       private_key         = "${file("../keys/tutorialinux.pem")}"
-      bastion_host        = "${aws_instance.bastion}"
+      bastion_host        = "${var.bastion_connect}"
     }
   }
 
@@ -46,7 +62,7 @@ resource "aws_instance" "consul" {
       host                = "${self.private_ip}"
       user                = "root"
       private_key         = "${file("../keys/tutorialinux.pem")}"
-      bastion_host        = "${aws_instance.bastion}"
+      bastion_host        = "${var.bastion_connect}"
     }
   }
 
@@ -60,7 +76,7 @@ resource "aws_instance" "consul" {
         host              = "${self.private_ip}"
         user              = "root"
         private_key       = "${file("../keys/tutorialinux.pem")}"
-        bastion_host      = "${aws_instance.bastion}"
+        bastion_host      = "${var.bastion_connect}"
       }
   }
 }
@@ -89,6 +105,9 @@ data "template_file" "consul_server_config" {
 resource "aws_security_group" "consul" {
   name   = "${var.name}"
   vpc_id = "${var.vpc_id}"
+  tags   = {
+    Name = "${var.name}"
+  }
 
   # HTTP API
   ingress {

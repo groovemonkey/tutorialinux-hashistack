@@ -44,7 +44,12 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 
 ### Log in to your instances
 
+Remember that only instances in your public subnet are directly accessible from across the Internet. Bounce through the bastion host to get to hosts in your private subnet.
+
 Use whatever key you created/downloaded for your terraform IAM user (above):
 
-```ssh root@$INSTANCE_IP -i keys/tutorialinux.pem```
+```
+ssh-add keys/tutorialinux.pem
+ssh -A root@$BASTION_IP
+```
 

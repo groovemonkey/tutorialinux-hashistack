@@ -8,3 +8,4 @@ variable "vpc_cidr" {}
 variable "vpc_id" {}
 variable "consul_server_version" {}
 variable "consul_cluster_size" {}
+variable "bastion_connect" {}

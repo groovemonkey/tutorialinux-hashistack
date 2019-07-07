@@ -1,14 +1,25 @@
 resource "aws_instance" "bastion" {
   ami                     = "${var.ami}"
-  count                   = 1
   instance_type           = "${var.instance_type}"
   key_name                = "${var.key_name}"
-  subnet_id               = "${var.subnet_id}"
+  subnet_id               = "${var.bastion_public_subnet}"
   vpc_security_group_ids  = ["${aws_security_group.bastion.id}"]
 
   tags = {
     Name = "bastion"
     role = "bastion"
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      host        = "${self.private_ip}"
+      user        = "root"
+      private_key = "${file("../keys/tutorialinux.pem")}"
+    }
+    inline = [
+      "pacman -Syu",
+      "yes | pacman -Sy sshguard"
+    ]
   }
 }
 

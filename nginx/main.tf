@@ -16,7 +16,7 @@ resource "aws_instance" "nginx" {
     content     = "${file("${path.module}/config/consul-systemd-service.conf")}"
     destination = "/etc/systemd/system/consul.service"
     connection {
-      host        = "${aws_instance.nginx}"
+      host        = "${self.private_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
     }
@@ -26,7 +26,7 @@ resource "aws_instance" "nginx" {
     content     = "${data.template_file.consul_client_config.rendered}"
     destination = "/usr/local/etc/consul/client.json"
     connection {
-      host        = "${aws_instance.nginx}"
+      host        = "${self.private_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
     }
@@ -36,7 +36,7 @@ resource "aws_instance" "nginx" {
     content     = "${file("${path.module}/config/consul-template.service")}"
     destination = "/etc/systemd/system/consul-template.service"
     connection {
-      host        = "${aws_instance.nginx}"
+      host        = "${self.private_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
     }
@@ -46,7 +46,7 @@ resource "aws_instance" "nginx" {
     content     = "${file("${path.module}/config/index.tpl")}"
     destination = "/usr/local/etc/consul-template/index.tpl"
     connection {
-      host        = "${aws_instance.nginx}"
+      host        = "${self.private_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
     }
@@ -54,7 +54,7 @@ resource "aws_instance" "nginx" {
 
   provisioner "remote-exec" {
     connection {
-      host        = "${aws_instance.nginx}"
+      host        = "${self.private_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
     }
