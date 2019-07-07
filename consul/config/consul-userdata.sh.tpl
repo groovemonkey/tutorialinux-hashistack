@@ -3,10 +3,10 @@
 set -euo pipefail
 
 echo "Starting system update..."
-yes | pacman -Syu
+pacman --noconfirm -Syu
 
 echo "Installing packages..."
-yes | pacman -Sy wget unzip
+pacman --noconfirm -Sy wget unzip
 
 echo "Starting consul install..."
 cd /tmp

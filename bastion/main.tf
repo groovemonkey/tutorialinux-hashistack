@@ -18,8 +18,8 @@ resource "aws_instance" "bastion" {
       timeout     = "15m"
     }
     inline = [
-      "yes | pacman -Syu",
-      "yes | pacman -Sy sshguard"
+      "pacman --noconfirm -Syu",
+      "pacman --noconfirm -Sy sshguard"
     ]
   }
 }

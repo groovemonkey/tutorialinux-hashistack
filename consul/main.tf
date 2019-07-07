@@ -131,6 +131,14 @@ resource "aws_security_group" "consul" {
     cidr_blocks = ["${var.vpc_cidr}"]
   }
 
+  # Server RPC
+  ingress {
+    protocol    = "tcp"
+    from_port   = 8300
+    to_port     = 8300
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+
   # LAN Serf
   ingress {
     protocol    = "tcp"

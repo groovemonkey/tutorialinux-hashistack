@@ -3,14 +3,14 @@
 set -euo pipefail
 
 echo "Starting system update..."
-yes | pacman -Syu
+pacman --noconfirm -Syu
 
 echo "Installing packages..."
-yes | pacman -Sy nginx wget unzip
+pacman --noconfirm -Sy nginx wget unzip
 
 # Avoiding potential race conditions between cloud-init and terraform provisioners
-mkdir /usr/local/etc/consul/
-mkdir /usr/local/etc/consul-template/
+mkdir -p /usr/local/etc/consul/
+mkdir -p /usr/local/etc/consul-template/
 
 # Consul Install
 echo "Starting consul install..."

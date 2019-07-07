@@ -9,9 +9,7 @@ Basic Setup Readme
 
 
 Consul:
-- bastion box? Or provision nginx server at the same time and use it as a bounce host?
-- test basic config
-- am I mixing normal resources and modules correctly?
+- consul isn't auto-starting
 
 Web Servers:
 - lock down -- should also only be accessible from bastion's IP, just like consul
