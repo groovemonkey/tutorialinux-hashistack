@@ -17,7 +17,7 @@ module "consul" {
   consul_server_version     = "1.5.2"
   instance_type             = "t2.micro"
   azs                       = "us-west-2a,us-west-2b,us-west-2c"
-  consul_cluster_size       = 1
+  consul_cluster_size       = 3
   key_name                  = "tutorialinux"
   name                      = "tutorialinux-consul"
   subnet_id                 = "${aws_subnet.private.id}"
@@ -30,7 +30,7 @@ module "consul" {
 module "nginx" {
   source = "../nginx"
   ami                       = "ami-0f0ddbdc490ad09fd"
-  nginx_pool_size           = 0
+  nginx_pool_size           = 1
   consul_version            = "1.5.2"
   instance_type             = "t2.micro"
   key_name                  = "tutorialinux"
