@@ -12,12 +12,13 @@ resource "aws_instance" "bastion" {
 
   provisioner "remote-exec" {
     connection {
-      host        = "${self.private_ip}"
+      host        = "${self.public_ip}"
       user        = "root"
       private_key = "${file("../keys/tutorialinux.pem")}"
+      timeout     = "15m"
     }
     inline = [
-      "pacman -Syu",
+      "yes | pacman -Syu",
       "yes | pacman -Sy sshguard"
     ]
   }

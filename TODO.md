@@ -31,3 +31,13 @@ create variables.tf file for infrastructure/:
 
 - install consul and consul-template via pacman -- the latest versions are in the community repo
 
+
+
+
+terraform bug?
+aws_internet_gateway.tutorialinux_gw: Still destroying... [id=igw-096629e213c5bd975, 9m10s elapsed]
+
+can't manually detach igw from VPC -- error message:
+Network vpc-059544e59fefc3f01 has some mapped public address(es). Please unmap those public address(es) before detaching the gateway.
+
+terminated the EC2 host which was using it...

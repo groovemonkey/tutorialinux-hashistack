@@ -53,3 +53,20 @@ ssh-add keys/tutorialinux.pem
 ssh -A root@$BASTION_IP
 ```
 
+
+### Common troubleshooting tasks
+
+See more verbose terraform output in your shell:
+`export TF_LOG=DEBUG`
+
+
+Have a look at the cloud-init log, or tail (-f follow) it:
+`journalctl -u cloud-init`
+`journalctl -fu cloud-init`
+
+Consul:
+`systemctl status consul`
+`journalctl -fu cloud-init`
+
+
+
