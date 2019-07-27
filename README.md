@@ -74,3 +74,7 @@ Consul:
 
 
 
+### Official Resources
+
+https://learn.hashicorp.com/consul?track=advanced#operations-and-development
+

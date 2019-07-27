@@ -8,10 +8,27 @@ Basic Setup Readme
 
 
 
+
+
+## FEATURE TODOs
+- service registration demo (a little python program?)
+
+- service discovery demo
+    - HTTP
+
+- consul DNS setup
+    - DNS service discovery demo
+
+- load balancing demo
+
+
+## SMALL TODOs:
+
 Bastion:
 - remove? The extra security/indirection/complication is not really needed.
 
 Consul:
+- add command for ssh -L tunneling to the consul UI
 - add node names in each config (set hostname?)
 
 Nginx:
