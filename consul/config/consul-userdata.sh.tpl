@@ -8,8 +8,15 @@ pacman --noconfirm -Syu
 echo "Installing packages..."
 pacman --noconfirm -Sy wget unzip consul
 
+# Configure consul dns via systemd-resolved
+cat <<EOF > "/etc/systemd/resolved.conf"
+DNS=127.0.0.1
+Domains=~consul
+EOF
+
 # Consul creates /usr/lib/systemd/system/consul.service
 
+# Add the server config
 cat <<EOF > "/etc/consul.d/server.json"
 {
   "datacenter": "tutorialinux",
@@ -21,7 +28,9 @@ cat <<EOF > "/etc/consul.d/server.json"
   "retry_join": [
     "provider=aws tag_key=role tag_value=consul-server"
   ],
-
+  "ports": {
+    "dns": 53
+  },
   "client_addr": "0.0.0.0",
   "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
   "leave_on_terminate": true,

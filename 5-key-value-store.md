@@ -11,5 +11,14 @@ consul kv put nginx/name "Steve" # update
 consul kv delete nginx/name
 consul kv delete -recurse nginx
 
-## Show UI
+consul kv get --detailed nginx/name
+
+
+## UI Demo
+
+Show the same thing in the consul UI.
+
+
+## Also see consul KVs
+More or less required for production use.
 

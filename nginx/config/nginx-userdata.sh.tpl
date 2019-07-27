@@ -17,6 +17,9 @@ cat <<EOF > "/etc/consul.d/client.json"
   "retry_join": [
     "provider=aws tag_key=role tag_value=consul-server"
   ],
+  "ports": {
+    "dns": 53
+  },
   "client_addr": "0.0.0.0",
   "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
   "leave_on_terminate": true,

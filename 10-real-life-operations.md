@@ -21,3 +21,9 @@ aws s3 cp $S3_LOCATION consul_state_${DATE}.snap
 consul snapshot restore consul_state_${DATE}.snap
 ```
 
+
+
+## Adding/Wrapping External Services into Consul
+
+https://learn.hashicorp.com/consul/developer-discovery/external
+
