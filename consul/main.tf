@@ -26,74 +26,14 @@ resource "aws_instance" "consul" {
     role                  = "consul-server"
   }
 
-  provisioner "remote-exec" {
-      inline = [
-        "mkdir /usr/local/etc/consul"
-      ]
-      # We're jumping through the nginx host to SSH to these
-      # https://www.terraform.io/docs/provisioners/connection.html
-      connection {
-        host              = "${self.private_ip}"
-        user              = "root"
-        private_key       = "${file("../keys/tutorialinux.pem")}"
-        bastion_host      = "${var.bastion_connect}"
-      }
-  }
-
-  provisioner "file" {
-    content               = "${data.template_file.consul_server_config.rendered}"
-    destination           = "/usr/local/etc/consul/server.json"
-    # We're jumping through the nginx host to SSH to these
-    # https://www.terraform.io/docs/provisioners/connection.html
-    connection {
-      host                = "${self.private_ip}"
-      user                = "root"
-      private_key         = "${file("../keys/tutorialinux.pem")}"
-      bastion_host        = "${var.bastion_connect}"
-    }
-  }
-
-  provisioner "file" {
-    content               = "${file("${path.module}/config/consul-systemd-service.conf")}"
-    destination           = "/etc/systemd/system/consul.service"
-    # We're jumping through the nginx host to SSH to these
-    # https://www.terraform.io/docs/provisioners/connection.html
-    connection {
-      host                = "${self.private_ip}"
-      user                = "root"
-      private_key         = "${file("../keys/tutorialinux.pem")}"
-      bastion_host        = "${var.bastion_connect}"
-    }
-  }
-
-  provisioner "remote-exec" {
-      inline = [
-        "systemctl daemon-reload"
-      ]
-      # We're jumping through the nginx host to SSH to these
-      # https://www.terraform.io/docs/provisioners/connection.html
-      connection {
-        host              = "${self.private_ip}"
-        user              = "root"
-        private_key       = "${file("../keys/tutorialinux.pem")}"
-        bastion_host      = "${var.bastion_connect}"
-      }
-  }
 }
 
 
-####################################################
-# consul-servers are configured via template files #
-####################################################
+################################################
+# consul-servers are configured via a template #
+################################################
 data "template_file" "consul_server_userdata" {
   template = "${file("${path.module}/config/consul-userdata.sh.tpl")}"
-  vars = {
-    CONSUL_VERSION = "${var.consul_server_version}"
-  }
-}
-
-data "template_file" "consul_server_config" {
-  template = "${file("${path.module}/config/consul-server.json.tpl")}"
   vars = {
     CONSUL_COUNT = "${var.consul_cluster_size}"
   }

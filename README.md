@@ -51,6 +51,10 @@ Use whatever key you created/downloaded for your terraform IAM user (above):
 ```
 ssh-add keys/tutorialinux.pem
 ssh -A root@$BASTION_IP
+
+# From your bastion or web server, jump to your non-publicly-accessible consul instances
+# (enter this command from the first server you SSH into)
+ssh $CONSUL_IP
 ```
 
 

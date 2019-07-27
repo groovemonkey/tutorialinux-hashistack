@@ -8,27 +8,20 @@ Basic Setup Readme
 
 
 
-Consul:
-- consul isn't auto-starting
+Bastion:
+- remove? The extra security/indirection/complication is not really needed.
 
-Web Servers:
-- lock down -- should also only be accessible from bastion's IP, just like consul
+Consul:
+- add node names in each config (set hostname?)
+
+Nginx:
 - register nginx service with consul on startup (systemd unit file -- postexec?)
 
-Bastion:
-- install sshguard
-
-
-Later:
-- separate bastion into its own module?
 
 create variables.tf file for infrastructure/:
 - ami should be a base_ami variable
 - key_name should be a var
 - abstract cloud-autojoin tag + value into a var, and use everywhere
-
-- install consul and consul-template via pacman -- the latest versions are in the community repo
-
 
 
 

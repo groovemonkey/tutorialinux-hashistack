@@ -108,7 +108,7 @@ resource "aws_route_table" "private_routes" {
     gateway_id    = "${aws_nat_gateway.nat_gw.id}"
   }
   tags = {
-    Name          = "tutorialinux-public-routes"
+    Name          = "tutorialinux-private-routes"
   }
 }
 

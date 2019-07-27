@@ -13,86 +13,18 @@ resource "aws_instance" "nginx" {
     role = "nginx"
   }
 
-  provisioner "remote-exec" {
-    connection {
-      host        = "${self.public_ip}"
-      user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
-    }
-    inline = [
-      "mkdir /usr/local/etc/consul",
-      "mkdir /usr/local/etc/consul-template"
-    ]
-  }
-
-  provisioner "file" {
-    content     = "${file("${path.module}/config/consul-systemd-service.conf")}"
-    destination = "/etc/systemd/system/consul.service"
-    connection {
-      host        = "${self.public_ip}"
-      user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
-    }
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.consul_client_config.rendered}"
-    destination = "/usr/local/etc/consul/client.json"
-    connection {
-      host        = "${self.public_ip}"
-      user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
-    }
-  }
-
-  provisioner "file" {
-    content     = "${file("${path.module}/config/consul-template.service")}"
-    destination = "/etc/systemd/system/consul-template.service"
-    connection {
-      host        = "${self.public_ip}"
-      user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
-    }
-  }
-
-  provisioner "file" {
-    content     = "${file("${path.module}/config/index.tpl")}"
-    destination = "/usr/local/etc/consul-template/index.tpl"
-    connection {
-      host        = "${self.public_ip}"
-      user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
-    }
-  }
-
-  # provisioner "remote-exec" {
-  #   connection {
-  #     host        = "${self.public_ip}"
-  #     user        = "root"
-  #     private_key = "${file("../keys/tutorialinux.pem")}"
-  #   }
-  #   inline = [
-  #     "systemctl daemon-reload",
-  #     "systemctl restart nginx"
-  #   ]
-  # }
 }
 
 
-##########################################
-# nginx is configured via template files #
-##########################################
+######################################
+# nginx is configured via a template #
+######################################
 data "template_file" "nginx_userdata" {
   template = "${file("${path.module}/config/nginx-userdata.sh.tpl")}"
-  vars = {
-    CONSUL_VERSION = "${var.consul_version}"
-  }
+  # vars = {
+  #   CONSUL_VERSION = "${var.consul_version}"
+  # }
 }
-
-data "template_file" "consul_client_config" {
-  template = "${file("${path.module}/config/consul-client.json.tpl")}"
-}
-
 
 ############################################
 # A security group for our nginx instances #
