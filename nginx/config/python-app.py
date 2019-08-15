@@ -4,11 +4,11 @@
 # python3 -m venv venv
 # source venv/bin/activate
 # pip install python-consul Flask
-# FLASK_APP=example-app.py flask run
+# FLASK_APP=python-app.py flask run
 
-# TODO Create a systemd unit file to run this app
-# DOCKER CONTAINER!????? NOMAD??? YESSSSSS! Ok, maybe let's not overwhelm people with another cluster setup...
-
+## 3rd-PARTY LIBRARY DOCS
+# https://flask.palletsprojects.com/en/1.1.x/quickstart/
+# https://python-consul.readthedocs.io/en/latest/
 
 from flask import Flask, request, jsonify
 import consul as consul_library
@@ -97,4 +97,8 @@ def deregister():
 @app.route('/state')
 def state():
     return jsonify(get_kv_registered_list())
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
 

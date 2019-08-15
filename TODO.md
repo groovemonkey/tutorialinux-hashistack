@@ -1,5 +1,10 @@
 # TODO
 
+
+- wtf is the default nginx conf -- where do I put conf files?
+- how do I expose the python app god dammit arghhhh I just want a stupid HTTP server running
+
+
 Basic Setup Readme
 - not automated
 - set up aws account, create + download .pem key
@@ -11,7 +16,12 @@ Basic Setup Readme
 
 
 ## FEATURE TODOs
-- service registration demo (a little python program?)
+- service registration demo (little python program)
+    - Install and run it on the nginx instance?
+    - Create a systemd unit file to run the python app
+    - Create a service registration config file
+    - Create an HTTP health check file (should return 200)
+
 
 python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-consul-template)
     - or fabio? Traefik?

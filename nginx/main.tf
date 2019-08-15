@@ -13,6 +13,27 @@ resource "aws_instance" "nginx" {
     role = "nginx"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /usr/local/bin/tutorialinuxapp"
+    ]
+    connection {
+      host                = "${self.public_ip}"
+      user                = "root"
+      private_key         = "${file("../keys/tutorialinux.pem")}"
+    }
+  }
+
+  provisioner "file" {
+    content               = "${file("${path.module}/config/python-app.py")}"
+    destination           = "/usr/local/bin/tutorialinuxapp/app.py"
+    connection {
+      host                = "${self.public_ip}"
+      user                = "root"
+      private_key         = "${file("../keys/tutorialinux.pem")}"
+    }
+  }
+
 }
 
 

@@ -2,8 +2,9 @@
 
 set -euo pipefail
 
-echo "Starting system update..."
-pacman --noconfirm -Syu
+# Kernel update breaks iptables
+# echo "Starting system update..."
+# pacman --noconfirm -Syu
 
 echo "Installing packages..."
 pacman --noconfirm -Sy wget unzip consul
@@ -28,9 +29,6 @@ cat <<EOF > "/etc/consul.d/server.json"
   "retry_join": [
     "provider=aws tag_key=role tag_value=consul-server"
   ],
-  "ports": {
-    "dns": 53
-  },
   "client_addr": "0.0.0.0",
   "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
   "leave_on_terminate": true,
@@ -39,6 +37,22 @@ cat <<EOF > "/etc/consul.d/server.json"
   "enable_debug": true
 }
 EOF
+
+
+# DNS Config
+cat <<EOF > "/etc/systemd/resolved.conf"
+DNS=127.0.0.1
+Domains=~consul
+EOF
+
+# Persist our iptables rules
+iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
+iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
+iptables-save > /etc/iptables/iptables.rules
+
+echo "Restarting systemd-resolved so that consul DNS config takes effect..."
+systemctl restart systemd-resolved
+
 
 echo "Enabling and starting Consul!"
 systemctl enable consul
