@@ -1,4 +1,6 @@
-keys/*
+infrastructure/keys/*
 terraform.tfstate*
 .terraform
 infrastructure/provider.tf
+infrastructure/.terraform.lock.hcl
+

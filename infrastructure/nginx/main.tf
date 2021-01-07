@@ -1,12 +1,12 @@
 resource "aws_instance" "nginx" {
-  ami                     = "${var.ami}"
-  count                   = "${var.nginx_pool_size}"
-  instance_type           = "${var.instance_type}"
-  key_name                = "${var.key_name}"
-  subnet_id               = "${var.subnet_id}"
-  iam_instance_profile    = "${aws_iam_instance_profile.nginx.name}"
-  user_data               = "${data.template_file.nginx_userdata.rendered}"
-  vpc_security_group_ids  = ["${aws_security_group.nginx.id}"]
+  ami                     = var.ami
+  count                   = var.nginx_pool_size
+  instance_type           = var.instance_type
+  key_name                = var.key_name
+  subnet_id               = var.subnet_id
+  iam_instance_profile    = aws_iam_instance_profile.nginx.name
+  user_data               = data.template_file.nginx_userdata.rendered
+  vpc_security_group_ids  = [aws_security_group.nginx.id]
 
   tags = {
     Name = "nginx-${count.index}"
@@ -18,19 +18,19 @@ resource "aws_instance" "nginx" {
       "mkdir -p /usr/local/bin/tutorialinuxapp"
     ]
     connection {
-      host                = "${self.public_ip}"
+      host                = self.public_ip
       user                = "root"
-      private_key         = "${file("../keys/tutorialinux.pem")}"
+      private_key         = file("../keys/tutorialinux.pem")
     }
   }
 
   provisioner "file" {
-    content               = "${file("${path.module}/config/python-app.py")}"
+    content               = file("${path.module}/config/python-app.py")
     destination           = "/usr/local/bin/tutorialinuxapp/app.py"
     connection {
-      host                = "${self.public_ip}"
+      host                = self.public_ip
       user                = "root"
-      private_key         = "${file("../keys/tutorialinux.pem")}"
+      private_key         = file("../keys/tutorialinux.pem")
     }
   }
 
@@ -41,9 +41,9 @@ resource "aws_instance" "nginx" {
 # nginx is configured via a template #
 ######################################
 data "template_file" "nginx_userdata" {
-  template = "${file("${path.module}/config/nginx-userdata.sh.tpl")}"
+  template = file("${path.module}/config/nginx-userdata.sh.tpl")
   # vars = {
-  #   CONSUL_VERSION = "${var.consul_version}"
+  #   CONSUL_VERSION = var.consul_version
   # }
 }
 
@@ -52,7 +52,7 @@ data "template_file" "nginx_userdata" {
 ############################################
 resource "aws_security_group" "nginx" {
   name   = "nginx"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   # HTTP allowed from the Internet
   ingress {
@@ -84,12 +84,12 @@ resource "aws_security_group" "nginx" {
 ################################################################
 resource "aws_iam_instance_profile" "nginx" {
     name = "nginx"
-    role = "${aws_iam_role.nginx.name}"
+    role = aws_iam_role.nginx.name
 }
 
 resource "aws_iam_role_policy" "nginx" {
     name = "nginx"
-    role = "${aws_iam_role.nginx.name}"
+    role = aws_iam_role.nginx.name
     policy = <<EOF
 {
     "Statement": [

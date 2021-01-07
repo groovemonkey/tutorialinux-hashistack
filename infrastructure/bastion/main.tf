@@ -1,9 +1,9 @@
 resource "aws_instance" "bastion" {
-  ami                     = "${var.ami}"
-  instance_type           = "${var.instance_type}"
-  key_name                = "${var.key_name}"
-  subnet_id               = "${var.bastion_public_subnet}"
-  vpc_security_group_ids  = ["${aws_security_group.bastion.id}"]
+  ami                     = var.ami
+  instance_type           = var.instance_type
+  key_name                = var.key_name
+  subnet_id               = var.bastion_public_subnet
+  vpc_security_group_ids  = [aws_security_group.bastion.id]
 
   tags = {
     Name = "bastion"
@@ -12,9 +12,9 @@ resource "aws_instance" "bastion" {
 
   provisioner "remote-exec" {
     connection {
-      host        = "${self.public_ip}"
+      host        = self.public_ip
       user        = "root"
-      private_key = "${file("../keys/tutorialinux.pem")}"
+      private_key = file("../keys/tutorialinux.pem")
       timeout     = "15m"
     }
     inline = [
@@ -29,7 +29,7 @@ resource "aws_instance" "bastion" {
 ####################################
 resource "aws_security_group" "bastion" {
   name   = "bastion"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
   # SSH allowed from the Internet
   ingress {

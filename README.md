@@ -29,7 +29,7 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 
 1. Create AWS Account, Log into AWS
 1. Create + download a keypair in AWS EC2
-1. `mv Downloads/tutorialinux.pem ./keys`
+1. `mv ~/Downloads/tutorialinux.pem ./infrastructure/keys/`
 1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in provider.tf
 1. mv provider.tf infrastructure/
 
