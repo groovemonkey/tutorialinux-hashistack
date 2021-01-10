@@ -3,4 +3,5 @@ terraform.tfstate*
 .terraform
 infrastructure/provider.tf
 infrastructure/.terraform.lock.hcl
+python-clients/venv
 
