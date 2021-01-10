@@ -5,3 +5,6 @@ infrastructure/provider.tf
 infrastructure/.terraform.lock.hcl
 python-clients/venv
 
+# this file is generated with consul-template
+python-clients/html/index.html
+

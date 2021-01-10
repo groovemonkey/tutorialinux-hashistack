@@ -3,7 +3,7 @@
 You can't really have useful service discovery without health checking. Consul gives you two ways to register healthchecks:
 
 1. check definition (config) files, and
-1. the HTTP API.
+1. the HTTP API (see the [python applications used in this course](python-clients/web.py))
 
 
 There are a bunch of different kinds of checks types that you can register, depending on what you're checking and how you want to do it:
@@ -22,7 +22,7 @@ Docs: https://www.consul.io/docs/agent/checks.html
 
 ## Ensure that enable_local_script_checks is turned on in the consul agent config
 
-Check yo config!
+Check your config!
 
 
 ## Register a check with a config file
