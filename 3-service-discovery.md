@@ -2,7 +2,7 @@
 
 
 ## TODO Add Service registration
-
+https://learn.hashicorp.com/tutorials/consul/get-started-service-discovery?in=consul/getting-started
 
 
 
