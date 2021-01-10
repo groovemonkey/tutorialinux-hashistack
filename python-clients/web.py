@@ -42,13 +42,12 @@ class DaveHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 Handler = DaveHttpRequestHandler
 
-# Decide which port to use
-port_argument = int(sys.argv[1])
-if is_port_available(port_argument):
-    port = port_argument
+# Try the user-supplied port, else pick a random one
+if len(sys.argv) > 1 and is_port_available(int(sys.argv[1])):
+    port = int(sys.argv[1])
 else:
-    port = choose_server_port((8000,9000))
-    print("Your chosen port ({0}) is not available, using {1} instead".format(port_argument, port))
+    port = choose_server_port((8000,9000)) # (port range)
+    print("Using port {0}".format(port))
 
 consul_service_name = "web"
 # Slight cleverness to get a unique service ID
