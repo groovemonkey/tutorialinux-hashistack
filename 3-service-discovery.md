@@ -10,7 +10,14 @@
 ## Service Discovery
 
 ### DNS API
-dig @127.0.0.1 -p 8600 web.service.consul
+    dig @127.0.0.1 -p 8600 web.service.consul
+
+Setting up consul DNS to work seamlessly via e.g. dnsmasq enables you to do things like:
+
+    curl web.service.consul
+
+(That would return ONLY healthy instances of the 'web' service in the Consul service catalog)
+
 
 #### Service records
 dig @127.0.0.1 -p 8600 web.service.consul SRV

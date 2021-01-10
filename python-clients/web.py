@@ -3,6 +3,7 @@ import http.server
 import socket
 import socketserver
 import random
+import sys
 
 """
 Takes a port number and returns True if it's available for the web server to use; False otherwise.
@@ -34,19 +35,47 @@ def choose_server_port(range_tuple):
 ##############
 # Server Setup
 ##############
-
 class DaveHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         self.path = 'html/index.html'
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
-
 Handler = DaveHttpRequestHandler
-port = choose_server_port((8000,9000))
-service_name = "web"
+
+# Decide which port to use
+port_argument = int(sys.argv[1])
+if is_port_available(port_argument):
+    port = port_argument
+else:
+    port = choose_server_port((8000,9000))
+    print("Your chosen port ({0}) is not available, using {1} instead".format(port_argument, port))
+
+consul_service_name = "web"
+# Slight cleverness to get a unique service ID
+consul_service_id = "{0}-{1}".format(consul_service_name, port)
 
 with socketserver.TCPServer(("", port), Handler) as httpd:
-    print("Registering with Consul...")
-    print("Now serving HTTP at port", port)
-    httpd.serve_forever()
+    try:
+        print("Connecting to Consul...")
+        c = consul.Consul()
+        c.agent.members() # hit the API to see if it's working
+    except:
+        print("Failed to connect to Consul...do you have an agent running?")
+        sys.exit(1)
 
+    print("Creating a service healthcheck...")
+    web_check = consul.Check.http(url="http://localhost:{0}/".format(port), interval="10s", timeout="5s")
+
+    # Register service + check
+    print("Registering service...")
+    c.agent.Service.register(c.agent, name=consul_service_name, service_id=consul_service_id, port=port, check=web_check)
+
+    # Run webserver
+    try:
+        print("Now serving HTTP at port", port)
+        httpd.serve_forever()
+    finally:
+        # Cleanup
+        print("Server stopped; deregistering from the Consul service catalog")
+        c.agent.Service.deregister(c.agent, service_id=consul_service_id)
+        print("Exiting!")
