@@ -29,12 +29,8 @@ python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-cons
 
 ## SMALL TODOs:
 
--cloud-init scripts not running?
-    - check  /var/lib/cloud/instances/ ($INSTANCEID/)
-    /var/log/cloud-init-output.log
-    journalctl -u cloud-init
+- set hostnames (for shell prompt and consul)
 
--bastion and nginx aren't getting sshguard installed (Unable to locate package sshguard)
 -deduplicate consul and nomad setups (through a shared file/symlink?)
 
 Consul:

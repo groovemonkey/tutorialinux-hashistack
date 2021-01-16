@@ -13,13 +13,19 @@ It covers setting up a consul cluster, running in AWS, which
 Here's our architecture:
 
 ```
-[nginx] --> uses consul-template to render something from the consul KV store
+( Your Laptop )
+   |
+(THE INTERNET)
    |
    |
+[bastion] - [nginx]-(uses consul-template to render something from the consul KV store)
+   /\
+  /  \
+ /    \
 (consul) - (consul) - (consul) --> a 3-node consul cluster
    |
    |
-(nomad) - a 3-node nomad cluster, acting as both servers and clients
+(nomad) - (nomad) - (nomad) - a 3-node nomad cluster, acting as both servers and clients
 ```
 
 I also ended up making a simple VPC config that creates a new VPC, a public and a private subnet, an internet gateway, and a routing table.
@@ -61,20 +67,43 @@ ssh -A root@$BASTION_IP
 ssh $CONSUL_IP
 ```
 
+### Locally accessing Consul and Nomad dashboards (UI)
+This will forward ports from remote hosts through your bastion host onto your local (work) machine. You can then access the consul and nomad UIs as if you were running a local binary.
+
+1. Look up your bastion, consul, and nomad hosts' IPs (just one consul and nomad IP is fine):
+   export BASTION_HOST=1.2.3.4
+   export CONSUL_SERVER=4.5.6.7
+   export NOMAD_SERVER=6.7.8.9
+
+1. Use ssh local forwarding to map those services' UI ports to your local machine
+   ssh -A ubuntu@$BASTION_HOST -L 8500:$CONSUL_SERVER:8500 -L 4646:$NOMAD_SERVER:4646
+
+1. Now you can access those UIs locally!
+- Nomad http://localhost:4646/ui/jobs
+- Consul http://localhost:8500/ui/tutorialinux/services
+
 
 ### Common troubleshooting tasks
 
 See more verbose terraform output in your shell:
 `export TF_LOG=DEBUG`
 
-
-Have a look at the cloud-init log, or tail (-f follow) it:
+Cloud-init scripts not running? Have a look at the cloud-init log, or tail (-f follow) it:
+`less /var/log/cloud-init-output.log`
 `journalctl -u cloud-init`
 `journalctl -fu cloud-init`
 
+If you get lost troubleshooting, check what your cloud-init script actually looks like when it's rendered on your instance as user-data:
+    - check  /var/lib/cloud/instances/ $INSTANCEID/ $YOUR_USER_DATA_STUFF
+
+
 Consul:
 `systemctl status consul`
-`journalctl -fu cloud-init`
+`journalctl -fu consul`
+
+Nomad:
+`systemctl status nomad`
+`journalctl -fu nomad`
 
 
 

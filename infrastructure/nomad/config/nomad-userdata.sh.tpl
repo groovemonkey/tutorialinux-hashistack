@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-
 set -eo pipefail
+DEBIAN_FRONTEND=noninteractive
+
+echo "Starting system update..."
+apt-get update && apt-get upgrade -y
 
 echo "Installing packages..."
 apt-get install -y wget unzip curl dnsmasq
@@ -8,19 +11,31 @@ apt-get install -y wget unzip curl dnsmasq
 # Add nomad Apt repository
 curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-
-# Kernel update breaks iptables
-# echo "Starting system update..."
-apt-get update && apt-get upgrade -y
-
+apt-get update
 
 echo "Setting up dnsmasq"
-mkdir -p /etc/dnsmasq.d
+cat <<EOF > "/etc/dnsmasq.conf"
+listen-address=127.0.0.1
+port=53
+no-negcache
+EOF
 
+mkdir -p /etc/dnsmasq.d
 cat <<EOF > "/etc/dnsmasq.d/10-consul"
 # Enable forward lookup of the 'consul' domain:
 server=/consul/127.0.0.1#8600
 EOF
+
+# Exorcise the DAEMONNNNNZZZZ
+systemctl disable --now systemd-resolved
+
+# not sure about this, but I'll try (appending to keep 127.0.0.53 and search us-west-2.compute.internal)
+# rm -rf /etc/resolv.conf
+
+echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+systemctl restart dnsmasq
+systemctl enable dnsmasq
 
 
 echo "Installing Consul"
@@ -66,14 +81,15 @@ cat <<EOF > "/etc/consul.d/agent.json"
     "provider=aws tag_key=role tag_value=consul-server"
   ],
   "client_addr": "0.0.0.0",
-  # "bind_addr": "{{GetInterfaceIP \"eth0\" }}", # should be 0.0.0.0
+  "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
   "leave_on_terminate": true,
-  "enable_syslog": true,
+  "enable_syslog": true
 }
 EOF
 
 
 echo "Enabling and starting Consul!"
+systemctl daemon-reload
 systemctl enable consul
 systemctl start consul
 

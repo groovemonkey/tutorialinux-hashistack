@@ -13,10 +13,10 @@ resource "aws_instance" "nginx" {
     role = "nginx"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p /usr/local/bin/tutorialinuxapp"
-    ]
+  # Two-step app move (put the .py script into Ubuntu's home, then create/move to privileged path)
+  provisioner "file" {
+    content               = file("${path.module}/config/python-app.py")
+    destination           = "/home/ubuntu/app.py"
     connection {
       host                = self.public_ip
       user                = "ubuntu"
@@ -24,9 +24,11 @@ resource "aws_instance" "nginx" {
     }
   }
 
-  provisioner "file" {
-    content               = file("${path.module}/config/python-app.py")
-    destination           = "/usr/local/bin/tutorialinuxapp/app.py"
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mkdir -p /usr/local/bin/tutorialinuxapp",
+      "sudo mv /home/ubuntu/app.py /usr/local/bin/tutorialinuxapp/"
+    ]
     connection {
       host                = self.public_ip
       user                = "ubuntu"
