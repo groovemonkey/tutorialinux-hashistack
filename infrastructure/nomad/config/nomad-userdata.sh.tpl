@@ -7,7 +7,7 @@ set -euo pipefail
 # pacman --noconfirm -Syu
 
 echo "Installing packages..."
-pacman --noconfirm -Sy wget unzip consul
+pacman --noconfirm -Sy wget unzip consul nomad
 
 # Configure consul dns via systemd-resolved
 cat <<EOF > "/etc/systemd/resolved.conf"
@@ -17,22 +17,21 @@ EOF
 
 # Consul creates /usr/lib/systemd/system/consul.service
 
-# Add the server config
-cat <<EOF > "/etc/consul.d/server.json"
+# Add the consul client config
+cat <<EOF > "/etc/consul.d/agent.json"
 {
   "datacenter": "tutorialinux",
-  "server": true,
-  "ui": true,
-  "bootstrap_expect": ${CONSUL_COUNT},
+  "server": false,
+  "ui": false,
 
   "data_dir": "/var/lib/consul",
   "retry_join": [
     "provider=aws tag_key=role tag_value=consul-server"
   ],
   "client_addr": "0.0.0.0",
-  "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
+  # "bind_addr": "{{GetInterfaceIP \"eth0\" }}", # should be 0.0.0.0
   "leave_on_terminate": true,
-  "enable_syslog": true
+  "enable_syslog": true,
 }
 EOF
 
@@ -67,8 +66,61 @@ do
 done
 set -e
 
-echo "Writing some data to the consul key-value store..."
-consul kv put nginx/name "Dave"
-consul kv put nginx/content "I love the Hashistack!"
+
+
+# Add the nomad server/client config
+echo "Setting up Nomad!"
+
+mkdir -p /etc/nomad
+cat <<EOF > "/etc/nomad/nomad.hcl"
+data_dir = "/var/lib/nomad"
+bind_addr = "0.0.0.0"
+leave_on_terminate = true
+enable_syslog = true
+
+# Running as both client and server is not what you want for production!
+server {
+    enabled = true
+    bootstrap_expect = ${NOMAD_COUNT}
+}
+client {
+    enabled = true
+
+}
+consul {
+    address = "127.0.0.1:8500"
+    ssl = false
+}
+EOF
+
+
+# Create the systemd unit file for nomad
+cat <<EOF > "/etc/systemd/system/nomad.service"
+[Unit]
+Description=Nomad
+Documentation=https://www.nomadproject.io/docs
+Requires=network-online.target consul.service
+After=network-online.target
+
+[Service]
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d
+KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=infinity
+LimitNPROC=infinity
+Restart=on-failure
+RestartSec=2
+StartLimitBurst=3
+StartLimitIntervalSec=10
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "Enabling and starting Nomad!"
+systemctl enable nomad
+systemctl start nomad
 
 echo "Done with our user-data script!"

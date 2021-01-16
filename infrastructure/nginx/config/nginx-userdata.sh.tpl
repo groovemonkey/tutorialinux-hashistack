@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
+
+# Become root
+sudo -i
 
 # Kernel update breaks iptables
 # echo "Starting system update..."

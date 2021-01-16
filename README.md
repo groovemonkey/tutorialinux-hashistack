@@ -17,6 +17,9 @@ Here's our architecture:
    |
    |
 (consul) - (consul) - (consul) --> a 3-node consul cluster
+   |
+   |
+(nomad) - a 3-node nomad cluster, acting as both servers and clients
 ```
 
 I also ended up making a simple VPC config that creates a new VPC, a public and a private subnet, an internet gateway, and a routing table.
@@ -29,14 +32,14 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 
 1. Create AWS Account, Log into AWS
 1. Create + download a keypair in AWS EC2
-1. `mv ~/Downloads/tutorialinux.pem ./infrastructure/keys/`
-1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in provider.tf
-1. mv provider.tf infrastructure/
+1. `chmod 600 ~/Downloads/tutorialinux.pem && mv ~/Downloads/tutorialinux.pem ./infrastructure/keys/`
+1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in keys/credentials.sh
 
 
 ### Infrastructure Creation
 
 1. `cd $THIS_REPOSITORY/infrastructure`
+1. `source ./keys/credentials.sh`
 1. `terraform init`
 1. `terraform plan`
 1. `terraform apply`

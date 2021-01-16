@@ -1,6 +1,6 @@
 resource "aws_instance" "nginx" {
   ami                     = var.ami
-  count                   = var.nginx_pool_size
+  count                   = 1
   instance_type           = var.instance_type
   key_name                = var.key_name
   subnet_id               = var.subnet_id
@@ -19,8 +19,8 @@ resource "aws_instance" "nginx" {
     ]
     connection {
       host                = self.public_ip
-      user                = "root"
-      private_key         = file("../keys/tutorialinux.pem")
+      user                = "arch"
+      private_key         = file("keys/${var.key_name}.pem")
     }
   }
 
@@ -29,8 +29,8 @@ resource "aws_instance" "nginx" {
     destination           = "/usr/local/bin/tutorialinuxapp/app.py"
     connection {
       host                = self.public_ip
-      user                = "root"
-      private_key         = file("../keys/tutorialinux.pem")
+      user                = "arch"
+      private_key         = file("keys/${var.key_name}.pem")
     }
   }
 

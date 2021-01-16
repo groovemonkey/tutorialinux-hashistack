@@ -1,18 +1,10 @@
 # TODO
 
 
-- wtf is the default nginx conf -- where do I put conf files?
-- how do I expose the python app god dammit arghhhh I just want a stupid HTTP server running
-
-
-Basic Setup Readme
-- not automated
-- set up aws account, create + download .pem key
-- export aws key ID / key
-- run terraform
-
-
-
+- only use local-exec TF provider for bastion
+- move nginx into container on nomad
+    - it's a great demo of a single-host webserver using consul, though
+- use auto-scaling groups for consul, nomad, and the consul-aware load balancer that I choose
 
 
 ## FEATURE TODOs
@@ -37,21 +29,12 @@ python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-cons
 
 ## SMALL TODOs:
 
-Bastion:
-- remove? The extra security/indirection/complication is not really needed.
-
 Consul:
 - add command for ssh -L tunneling to the consul UI
 - add node names in each config (set hostname?)
 
 Nginx:
 - register nginx service with consul on startup (systemd unit file -- postexec?)
-
-
-create variables.tf file for infrastructure/:
-- ami should be a base_ami variable
-- key_name should be a var
-- abstract cloud-autojoin tag + value into a var, and use everywhere
 
 
 
