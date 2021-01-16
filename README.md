@@ -1,4 +1,4 @@
-# TutoriaLinux Set-Up-Consul-With-Terraform extravaganza!
+# TutoriaLinux Hashistack extravaganza!
 This code is all you'll need to follow along with the free mini-course I put up on YouTube.
 
 It covers setting up a consul cluster, running in AWS, which

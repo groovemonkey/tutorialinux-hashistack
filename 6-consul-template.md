@@ -19,7 +19,7 @@ See the [official site and documentation](https://github.com/hashicorp/consul-te
 
 ## Create a systemd service
 
-    cat << EOF > /etc/systemd/systemconsul-template.service
+    cat << EOF > /etc/systemd/system/consul-template.service
     [Unit]
     Description=the consul-template service
     # presumes that consul is installed as a service (won't work with `consul agent -dev`)

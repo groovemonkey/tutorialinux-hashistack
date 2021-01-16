@@ -1,7 +1,10 @@
 # TODO
 
+- move python clients into containers
+- run containers on nomad
+- set up traefik or fabio
+- serve traffic on the public Internet
 
-- only use local-exec TF provider for bastion
 - move nginx into container on nomad
     - it's a great demo of a single-host webserver using consul, though
 - use auto-scaling groups for consul, nomad, and the consul-aware load balancer that I choose
