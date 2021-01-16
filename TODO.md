@@ -29,6 +29,14 @@ python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-cons
 
 ## SMALL TODOs:
 
+-cloud-init scripts not running?
+    - check  /var/lib/cloud/instances/ ($INSTANCEID/)
+    /var/log/cloud-init-output.log
+    journalctl -u cloud-init
+
+-bastion and nginx aren't getting sshguard installed (Unable to locate package sshguard)
+-deduplicate consul and nomad setups (through a shared file/symlink?)
+
 Consul:
 - add command for ssh -L tunneling to the consul UI
 - add node names in each config (set hostname?)

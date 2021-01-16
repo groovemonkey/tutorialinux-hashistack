@@ -13,13 +13,12 @@ resource "aws_instance" "bastion" {
   provisioner "remote-exec" {
     connection {
       host        = self.public_ip
-      user        = "arch"
+      user        = "ubuntu"
       private_key = file("keys/${var.key_name}.pem")
       timeout     = "15m"
     }
     inline = [
-      "sudo pacman --noconfirm -Syu",
-      "sudo pacman --noconfirm -Sy sshguard"
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard"
     ]
   }
 }

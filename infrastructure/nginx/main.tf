@@ -9,17 +9,17 @@ resource "aws_instance" "nginx" {
   vpc_security_group_ids  = [aws_security_group.nginx.id]
 
   tags = {
-    Name = "nginx-${count.index}"
+    Name = "nginx"
     role = "nginx"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p /usr/local/bin/tutorialinuxapp"
+      "sudo mkdir -p /usr/local/bin/tutorialinuxapp"
     ]
     connection {
       host                = self.public_ip
-      user                = "arch"
+      user                = "ubuntu"
       private_key         = file("keys/${var.key_name}.pem")
     }
   }
@@ -29,7 +29,7 @@ resource "aws_instance" "nginx" {
     destination           = "/usr/local/bin/tutorialinuxapp/app.py"
     connection {
       host                = self.public_ip
-      user                = "arch"
+      user                = "ubuntu"
       private_key         = file("keys/${var.key_name}.pem")
     }
   }
@@ -42,9 +42,10 @@ resource "aws_instance" "nginx" {
 ######################################
 data "template_file" "nginx_userdata" {
   template = file("${path.module}/config/nginx-userdata.sh.tpl")
-  # vars = {
-  #   CONSUL_VERSION = var.consul_version
-  # }
+  vars = {
+    CONSUL_VERSION  = var.consul_version
+    CONSUL_TEMPLATE_VERSION = "0.25.1"
+  }
 }
 
 ############################################

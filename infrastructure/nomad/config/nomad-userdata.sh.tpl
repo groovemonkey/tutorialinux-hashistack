@@ -1,23 +1,60 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
+
+echo "Installing packages..."
+apt-get install -y wget unzip curl dnsmasq
+
+# Add nomad Apt repository
+curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 
 # Kernel update breaks iptables
 # echo "Starting system update..."
-# pacman --noconfirm -Syu
+apt-get update && apt-get upgrade -y
 
-echo "Installing packages..."
-pacman --noconfirm -Sy wget unzip consul nomad
 
-# Configure consul dns via systemd-resolved
-cat <<EOF > "/etc/systemd/resolved.conf"
-DNS=127.0.0.1
-Domains=~consul
+echo "Setting up dnsmasq"
+mkdir -p /etc/dnsmasq.d
+
+cat <<EOF > "/etc/dnsmasq.d/10-consul"
+# Enable forward lookup of the 'consul' domain:
+server=/consul/127.0.0.1#8600
 EOF
 
-# Consul creates /usr/lib/systemd/system/consul.service
+
+echo "Installing Consul"
+wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip
+unzip consul_${CONSUL_VERSION}_linux_amd64.zip
+mv consul /usr/local/bin/consul
+
+# user and group
+groupadd consul
+mkdir -p /var/lib/consul
+useradd -d /var/lib/consul -g consul consul
+chown consul:consul /var/lib/consul
+
+# Add the consul agent systemd unit (service)
+cat <<EOF > "/usr/lib/systemd/system/consul.service"
+[Unit]
+Description=Consul Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=consul
+Group=consul
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent $CONSUL_FLAGS -config-dir=/etc/consul.d
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 # Add the consul client config
+mkdir -p /etc/consul.d
 cat <<EOF > "/etc/consul.d/agent.json"
 {
   "datacenter": "tutorialinux",
@@ -34,21 +71,6 @@ cat <<EOF > "/etc/consul.d/agent.json"
   "enable_syslog": true,
 }
 EOF
-
-
-# DNS Config
-cat <<EOF > "/etc/systemd/resolved.conf"
-DNS=127.0.0.1
-Domains=~consul
-EOF
-
-# Persist our iptables rules
-iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
-iptables-save > /etc/iptables/iptables.rules
-
-echo "Restarting systemd-resolved so that consul DNS config takes effect..."
-systemctl restart systemd-resolved
 
 
 echo "Enabling and starting Consul!"
@@ -71,6 +93,9 @@ set -e
 # Add the nomad server/client config
 echo "Setting up Nomad!"
 
+echo "Installing Nomad"
+apt-get install nomad
+
 mkdir -p /etc/nomad
 cat <<EOF > "/etc/nomad/nomad.hcl"
 data_dir = "/var/lib/nomad"
@@ -91,32 +116,6 @@ consul {
     address = "127.0.0.1:8500"
     ssl = false
 }
-EOF
-
-
-# Create the systemd unit file for nomad
-cat <<EOF > "/etc/systemd/system/nomad.service"
-[Unit]
-Description=Nomad
-Documentation=https://www.nomadproject.io/docs
-Requires=network-online.target consul.service
-After=network-online.target
-
-[Service]
-ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d
-KillMode=process
-KillSignal=SIGINT
-LimitNOFILE=infinity
-LimitNPROC=infinity
-Restart=on-failure
-RestartSec=2
-StartLimitBurst=3
-StartLimitIntervalSec=10
-TasksMax=infinity
-
-[Install]
-WantedBy=multi-user.target
 EOF
 
 echo "Enabling and starting Nomad!"

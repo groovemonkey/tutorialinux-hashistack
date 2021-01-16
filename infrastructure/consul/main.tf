@@ -34,7 +34,8 @@ resource "aws_instance" "consul" {
 data "template_file" "consul_server_userdata" {
   template = file("${path.module}/config/consul-userdata.sh.tpl")
   vars = {
-    CONSUL_COUNT = var.consul_cluster_size
+    CONSUL_COUNT    = var.consul_cluster_size
+    CONSUL_VERSION  = var.consul_version
   }
 }
 

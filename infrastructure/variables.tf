@@ -24,6 +24,6 @@ variable "private_subnet_az" {
 }
 
 variable "base_ec2_ami" {
-  type            = string
-  default         = "ami-0cfda0fc60e54b0d4"
+  # us-west-2 ubuntu 20.04 HVM SSD
+  default = "ami-07dd19a7900a1f049"
 }

@@ -1,18 +1,54 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
-# Become root
-sudo -i
+echo "Becoming root..."
+DEBIAN_FRONTEND=noninteractive
 
 # Kernel update breaks iptables
-# echo "Starting system update..."
-# pacman --noconfirm -Syu
+echo "Starting system update..."
+apt-get update
+apt-get -y upgrade
 
 echo "Installing packages..."
-pacman --noconfirm -Sy nginx wget unzip consul consul-template python3 python-pip
+apt-get install -y sshguard nginx wget unzip python3 python3-venv dnsmasq
 
+echo "Installing consul-template"
+wget https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
+unzip consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
+sudo cp consul-template /usr/local/bin/
+
+echo "Installing Consul"
+wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip
+unzip consul_${CONSUL_VERSION}_linux_amd64.zip
+mv consul /usr/local/bin/consul
+
+# user and group
+groupadd consul
+mkdir -p /var/lib/consul
+useradd -d /var/lib/consul -g consul consul
+chown consul:consul /var/lib/consul
+
+# Add the consul agent systemd unit (service)
+cat <<EOF > "/usr/lib/systemd/system/consul.service"
+[Unit]
+Description=Consul Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=consul
+Group=consul
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent $CONSUL_FLAGS -config-dir=/etc/consul.d
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 # Consul client config
+mkdir -p /etc/consul.d
 cat <<EOF > '/etc/consul.d/client.json'
 {
   "datacenter": "tutorialinux",
@@ -30,21 +66,6 @@ cat <<EOF > '/etc/consul.d/client.json'
 EOF
 
 
-# DNS Config
-cat <<EOF > '/etc/systemd/resolved.conf'
-DNS=127.0.0.1
-Domains=~consul
-EOF
-
-# Persist our iptables rules
-iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
-iptables-save > /etc/iptables/iptables.rules
-
-echo "Restarting systemd-resolved so that consul DNS config takes effect..."
-systemctl restart systemd-resolved
-
-
 # Consul-template -- default systemd file requires vault??
 cat <<EOF > '/usr/lib/systemd/system/consul-template.service'
 [Unit]
@@ -52,7 +73,7 @@ Description=Hashicorp's amazing consul-template
 After=consul.service
 
 [Service]
-ExecStart=/usr/bin/consul-template -max-stale 5s -template "/etc/consul-template/index.tpl:/usr/share/nginx/html/index.html"
+ExecStart=/usr/local/bin/consul-template -max-stale 5s -template "/etc/consul-template/index.tpl:/usr/share/nginx/html/index.html"
 Restart=always
 RestartSec=5
 KillSignal=SIGINT
@@ -63,6 +84,7 @@ EOF
 
 
 # Consul-template nginx template
+mkdir -p /etc/consul-template
 cat <<EOF > '/etc/consul-template/index.tpl'
 <!DOCTYPE html>
 <html>
@@ -106,13 +128,14 @@ EOF
 
 # Python Application Config
 echo "Setting up python application..."
-set +e # venv/bin/activate has an unset var :(
+set +eu # venv/bin/activate has an unset var :(
 mkdir -p /usr/local/bin/tutorialinuxapp
 cd /usr/local/bin/tutorialinuxapp
 python3 -m venv venv
 source venv/bin/activate
 pip install python-consul gunicorn Flask
-set -e
+deactivate
+set -eu
 
 echo "Setting up gunicorn config..."
 # Gunicorn config
@@ -168,6 +191,8 @@ cat <<EOF > '/etc/consul.d/python-service.json'
 EOF
 
 
+# nginx config for python app
+mkdir -p /etc/nginx/sites-available
 cat <<EOF > '/etc/nginx/sites-available/tutorialinux-python'
 server {
     listen 80;

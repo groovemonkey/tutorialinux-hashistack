@@ -35,6 +35,7 @@ data "template_file" "nomad_server_userdata" {
   template = file("${path.module}/config/nomad-userdata.sh.tpl")
   vars = {
     NOMAD_COUNT = var.nomad_cluster_size
+    CONSUL_VERSION  = var.consul_version
   }
 }
 

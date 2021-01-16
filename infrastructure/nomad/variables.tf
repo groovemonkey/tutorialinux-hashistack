@@ -9,3 +9,6 @@ variable "vpc_id" {}
 variable "nomad_cluster_size" {
     default = 3
 }
+variable "consul_version" {
+    default = "1.9.1"
+}

@@ -1,23 +1,49 @@
 #!/usr/bin/env bash
-
-set -euo pipefail
+set -eo pipefail
+DEBIAN_FRONTEND=noninteractive
 
 # Kernel update breaks iptables
 # echo "Starting system update..."
-# pacman --noconfirm -Syu
+apt-get update
+apt-get -y upgrade
 
 echo "Installing packages..."
-pacman --noconfirm -Sy wget unzip consul
+apt-get install -y wget unzip dnsmasq
 
-# Configure consul dns via systemd-resolved
-cat <<EOF > "/etc/systemd/resolved.conf"
-DNS=127.0.0.1
-Domains=~consul
+
+echo "Installing Consul"
+wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip
+unzip consul_${CONSUL_VERSION}_linux_amd64.zip
+mv consul /usr/local/bin/consul
+
+# user and group
+groupadd consul
+mkdir -p /var/lib/consul
+useradd -d /var/lib/consul -g consul consul
+chown consul:consul /var/lib/consul
+
+# Add the consul agent systemd unit (service)
+cat <<EOF > "/etc/systemd/system/consul.service"
+[Unit]
+Description=Consul Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=consul
+Group=consul
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent $CONSUL_FLAGS -config-dir=/etc/consul.d
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
-# Consul creates /usr/lib/systemd/system/consul.service
 
 # Add the server config
+mkdir -p /etc/consul.d
 cat <<EOF > "/etc/consul.d/server.json"
 {
   "datacenter": "tutorialinux",
@@ -35,21 +61,6 @@ cat <<EOF > "/etc/consul.d/server.json"
   "enable_syslog": true
 }
 EOF
-
-
-# DNS Config
-cat <<EOF > "/etc/systemd/resolved.conf"
-DNS=127.0.0.1
-Domains=~consul
-EOF
-
-# Persist our iptables rules
-iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
-iptables-save > /etc/iptables/iptables.rules
-
-echo "Restarting systemd-resolved so that consul DNS config takes effect..."
-systemctl restart systemd-resolved
 
 
 echo "Enabling and starting Consul!"

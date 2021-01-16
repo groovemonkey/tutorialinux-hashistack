@@ -44,6 +44,7 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 1. `terraform plan`
 1. `terraform apply`
 
+*Note*: (When you're done working for the day, remember to `terraform destroy` your infrastructure to make sure AWS doesn't bill you for the time you're not using your infrastructure!)
 
 ### Log in to your instances
 
