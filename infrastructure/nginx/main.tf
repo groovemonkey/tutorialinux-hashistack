@@ -39,14 +39,24 @@ resource "aws_instance" "nginx" {
 }
 
 
-######################################
-# nginx is configured via a template #
-######################################
+##########################################
+# nginx is configured via template files #
+##########################################
 data "template_file" "nginx_userdata" {
   template = file("${path.module}/config/nginx-userdata.sh.tpl")
   vars = {
-    CONSUL_VERSION  = var.consul_version
-    CONSUL_TEMPLATE_VERSION = "0.25.1"
+    BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
+    DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
+    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
+    CONSUL_TEMPLATE_VERSION       = var.consul_template_version
+  }
+}
+
+data "template_file" "consul_install_snippet" {
+  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
+  vars = {
+    CONSUL_VERSION                = var.consul_version
   }
 }
 

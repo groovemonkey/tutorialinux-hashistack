@@ -85,6 +85,9 @@ This will forward ports from remote hosts through your bastion host onto your lo
 
 ### Common troubleshooting tasks
 
+`Error: error configuring Terraform AWS Provider: no valid credential sources for Terraform AWS Provider found.`
+This means you forgot to use the credentials.sh script before starting to work in a new shell session.
+
 See more verbose terraform output in your shell:
 `export TF_LOG=DEBUG`
 

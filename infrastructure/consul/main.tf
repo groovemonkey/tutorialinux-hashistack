@@ -34,8 +34,17 @@ resource "aws_instance" "consul" {
 data "template_file" "consul_server_userdata" {
   template = file("${path.module}/config/consul-userdata.sh.tpl")
   vars = {
-    CONSUL_COUNT    = var.consul_cluster_size
-    CONSUL_VERSION  = var.consul_version
+    BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
+    DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
+    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_COUNT                  = var.consul_cluster_size
+  }
+}
+
+data "template_file" "consul_install_snippet" {
+  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
+  vars = {
+    CONSUL_VERSION                = var.consul_version
   }
 }
 

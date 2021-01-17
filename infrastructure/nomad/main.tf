@@ -34,8 +34,25 @@ resource "aws_instance" "nomad" {
 data "template_file" "nomad_server_userdata" {
   template = file("${path.module}/config/nomad-userdata.sh.tpl")
   vars = {
-    NOMAD_COUNT = var.nomad_cluster_size
-    CONSUL_VERSION  = var.consul_version
+    BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
+    DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
+    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
+    NOMAD_INSTALL_SNIPPET         = file("${path.module}/../shared_config/install_nomad.sh.tpl")
+  }
+}
+
+data "template_file" "consul_install_snippet" {
+  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
+  vars = {
+    CONSUL_VERSION                = var.consul_version
+  }
+}
+
+data "template_file" "nomad_install_snippet" {
+  template = file("${path.module}/../shared_config/install_nomad.sh.tpl")
+  vars = {
+    NOMAD_COUNT                   = var.nomad_cluster_size
   }
 }
 

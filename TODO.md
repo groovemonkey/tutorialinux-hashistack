@@ -31,13 +31,7 @@ python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-cons
 
 
 ## SMALL TODOs:
-
 - set hostnames (for shell prompt and consul)
-
--deduplicate consul and nomad setups (through a shared file/symlink?)
-
-Consul:
-- add command for ssh -L tunneling to the consul UI
 - add node names in each config (set hostname?)
 
 Nginx:
