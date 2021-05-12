@@ -1,7 +1,7 @@
 # This creates a bastion host
 module "bastion" {
   source = "./bastion"
-  bastion_public_subnet     = aws_subnet.public.id
+  public_subnet             = aws_subnet.public.id
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
   key_name                  = "tutorialinux"
@@ -49,6 +49,7 @@ module "traefik" {
   instance_type             = "t2.micro"
   key_name                  = "tutorialinux"
   vpc_id                    = aws_vpc.tutorialinux.id
+  vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
 }
 
 # This instantiates an nginx host, running the consul agent and reading from the consul KV store
