@@ -15,15 +15,15 @@ resource "aws_instance" "nomad" {
   #   availability_zone = var.azs[count.index % len(azs)]
   #
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
-  # availability_zone       = element(split(",", var.azs), count.index)
+  availability_zone       = element(split(",", var.azs), count.index)
   subnet_id               = var.subnet_id
   iam_instance_profile    = aws_iam_instance_profile.nomad.name
   user_data               = data.template_file.nomad_server_userdata.rendered
   vpc_security_group_ids  = [aws_security_group.nomad.id]
 
   tags = {
-    Name                  = "nomad-server"
-    role                  = "nomad-server"
+    Name                  = var.name
+    role                  = var.name
   }
 }
 

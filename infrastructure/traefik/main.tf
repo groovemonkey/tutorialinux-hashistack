@@ -1,13 +1,15 @@
 resource "aws_instance" "traefik" {
   ami                     = var.ami
+  count                   = var.num_instances
   instance_type           = var.instance_type
   key_name                = var.key_name
   subnet_id               = var.public_subnet
+  availability_zone       = element(split(",", var.azs), count.index)
   vpc_security_group_ids  = [aws_security_group.traefik.id]
 
   tags = {
-    Name = "traefik"
-    role = "traefik"
+    Name                  = var.name
+    role                  = var.name
   }
 
   provisioner "remote-exec" {
@@ -50,7 +52,7 @@ data "template_file" "consul_install_snippet" {
 # A security group for our traefik #
 ####################################
 resource "aws_security_group" "traefik" {
-  name   = "traefik"
+  name   = var.name
   vpc_id = var.vpc_id
 
   # HTTP/HTTPS allowed from our internal network

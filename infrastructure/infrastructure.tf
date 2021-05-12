@@ -11,14 +11,12 @@ module "bastion" {
 # This creates a consul cluster
 module "consul" {
   source = "./consul"
-
-  # Arch ebs-hvm-x86_64-stable for us-west-2 from https://www.uplinklabs.net/projects/arch-linux-on-ec2/
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
   azs                       = "us-west-2a,us-west-2b,us-west-2c"
   consul_cluster_size       = 3
   key_name                  = "tutorialinux"
-  name                      = "tutorialinux-consul"
+  name                      = "consul"
   subnet_id                 = aws_subnet.private.id
   vpc_id                    = aws_vpc.tutorialinux.id
   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
@@ -28,14 +26,12 @@ module "consul" {
 # This creates a nomad cluster
 module "nomad" {
   source = "./nomad"
-
-  # Arch ebs-hvm-x86_64-stable for us-west-2 from https://www.uplinklabs.net/projects/arch-linux-on-ec2/
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
   azs                       = "us-west-2a,us-west-2b,us-west-2c"
   nomad_cluster_size        = 3
   key_name                  = "tutorialinux"
-  name                      = "tutorialinux-nomad"
+  name                      = "nomad-server"
   subnet_id                 = aws_subnet.private.id
   vpc_id                    = aws_vpc.tutorialinux.id
   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
@@ -44,10 +40,13 @@ module "nomad" {
 # This creates a traefik host
 module "traefik" {
   source = "./traefik"
-  public_subnet             = aws_subnet.public.id
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
+  azs                       = "us-west-2a,us-west-2b,us-west-2c"
+  num_instances             = 3
   key_name                  = "tutorialinux"
+  name                      = "traefik"
+  public_subnet             = aws_subnet.public.id
   vpc_id                    = aws_vpc.tutorialinux.id
   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
 }
