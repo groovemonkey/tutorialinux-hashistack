@@ -41,6 +41,16 @@ module "nomad" {
   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
 }
 
+# This creates a traefik host
+module "traefik" {
+  source = "./traefik"
+  public_subnet             = aws_subnet.public.id
+  ami                       = var.base_ec2_ami
+  instance_type             = "t2.micro"
+  key_name                  = "tutorialinux"
+  vpc_id                    = aws_vpc.tutorialinux.id
+}
+
 # This instantiates an nginx host, running the consul agent and reading from the consul KV store
 module "nginx" {
   source = "./nginx"
