@@ -47,18 +47,12 @@ data "template_file" "nginx_userdata" {
   vars = {
     BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
-    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
     CONSUL_TEMPLATE_VERSION       = var.consul_template_version
   }
 }
 
-data "template_file" "consul_install_snippet" {
-  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
-  vars = {
-    CONSUL_VERSION                = var.consul_version
-  }
-}
 
 ############################################
 # A security group for our nginx instances #

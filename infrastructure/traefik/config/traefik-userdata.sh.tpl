@@ -14,4 +14,30 @@ ${CONSUL_INSTALL_SNIPPET}
 
 ${CONSUL_CLIENT_CONFIG_SNIPPET}
 
+# Add traefik systemd unit file
+cat <<EOF > "/usr/lib/systemd/system/traefik.service"
+[Unit]
+Description=Traefik
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+# run traefik with consul provider enabled (passing command-line args is MUTUTALLY exclusive with a config file)
+ExecStart=/usr/local/bin/traefik --providers.consul
+
+Restart=on-failure
+ExecReload=/usr/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "Starting Traefik!"
+systemctl daemon-reload
+systemctl enable traefik
+systemctl start traefik
+
+
+
 echo "Done with our user-data script!"

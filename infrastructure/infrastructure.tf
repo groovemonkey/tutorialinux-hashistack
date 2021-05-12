@@ -13,10 +13,10 @@ module "consul" {
   source = "./consul"
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
-  azs                       = "us-west-2a,us-west-2b,us-west-2c"
-  consul_cluster_size       = 3
+  # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   key_name                  = "tutorialinux"
-  name                      = "consul"
+  # name MUST be consul-server so that consul auto-join works (instances will get a corresponding 'role' tag)
+  name                      = "consul-server"
   subnet_id                 = aws_subnet.private.id
   vpc_id                    = aws_vpc.tutorialinux.id
   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
@@ -28,7 +28,7 @@ module "nomad" {
   source = "./nomad"
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
-  azs                       = "us-west-2a,us-west-2b,us-west-2c"
+  # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   nomad_cluster_size        = 3
   key_name                  = "tutorialinux"
   name                      = "nomad-server"
@@ -42,7 +42,7 @@ module "traefik" {
   source = "./traefik"
   ami                       = var.base_ec2_ami
   instance_type             = "t2.micro"
-  azs                       = "us-west-2a,us-west-2b,us-west-2c"
+  # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   num_instances             = 3
   key_name                  = "tutorialinux"
   name                      = "traefik"

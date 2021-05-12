@@ -15,7 +15,7 @@ resource "aws_instance" "nomad" {
   #   availability_zone = var.azs[count.index % len(azs)]
   #
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
-  availability_zone       = element(split(",", var.azs), count.index)
+  # availability_zone       = element(split(",", var.azs), count.index)
   subnet_id               = var.subnet_id
   iam_instance_profile    = aws_iam_instance_profile.nomad.name
   user_data               = data.template_file.nomad_server_userdata.rendered
@@ -36,18 +36,13 @@ data "template_file" "nomad_server_userdata" {
   vars = {
     BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
-    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
-    NOMAD_INSTALL_SNIPPET         = file("${path.module}/../shared_config/install_nomad.sh.tpl")
+    NOMAD_INSTALL_SNIPPET         = data.template_file.nomad_install_snippet.rendered
+    ETHERPAD_NOMAD_JOB_SNIPPET    = file("${path.module}/config/etherpad-nomad-svc.hcl")
   }
 }
 
-data "template_file" "consul_install_snippet" {
-  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
-  vars = {
-    CONSUL_VERSION                = var.consul_version
-  }
-}
 
 data "template_file" "nomad_install_snippet" {
   template = file("${path.module}/../shared_config/install_nomad.sh.tpl")

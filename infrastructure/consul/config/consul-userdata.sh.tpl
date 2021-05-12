@@ -5,18 +5,19 @@ ${BASE_PACKAGES_SNIPPET}
 
 ${DNSMASQ_CONFIG_SNIPPET}
 
+${CONSUL_INSTALL_SNIPPET}
+
 # Add the server config
-mkdir -p /etc/consul.d
-cat <<EOF > "/etc/consul.d/server.json"
+cat <<EOF > "/etc/consul.d/consul.hcl"
 {
   "datacenter": "tutorialinux",
   "server": true,
   "ui": true,
-  "bootstrap_expect": ${CONSUL_COUNT},
+  "bootstrap_expect": 3,
 
   "data_dir": "/var/lib/consul",
   "retry_join": [
-    "provider=aws tag_key=role tag_value=consul-server"
+    "provider=aws tag_key=role tag_value=consul-server addr_type=private_v4"
   ],
   "client_addr": "0.0.0.0",
   "bind_addr": "{{GetInterfaceIP \"eth0\" }}",
@@ -25,11 +26,12 @@ cat <<EOF > "/etc/consul.d/server.json"
 }
 EOF
 
-${CONSUL_INSTALL_SNIPPET}
+systemctl enable consul
+systemctl start consul
 
 # Could take a few seconds for consul to come up
 echo "Waiting for consul to come up..."
-sleep 30
+sleep 10
 set +e
 until [[ $(curl localhost:8500/v1/status/leader) != "No known Consul servers" ]]
 do

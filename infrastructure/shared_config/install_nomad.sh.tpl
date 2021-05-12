@@ -4,8 +4,7 @@ echo "Setting up Nomad!"
 echo "Installing Nomad"
 apt-get install nomad
 
-mkdir -p /etc/nomad
-cat <<EOF > "/etc/nomad/nomad.hcl"
+cat <<EOF > "/etc/nomad.d/nomad.hcl"
 data_dir = "/var/lib/nomad"
 bind_addr = "0.0.0.0"
 leave_on_terminate = true

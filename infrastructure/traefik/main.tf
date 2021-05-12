@@ -4,24 +4,12 @@ resource "aws_instance" "traefik" {
   instance_type           = var.instance_type
   key_name                = var.key_name
   subnet_id               = var.public_subnet
-  availability_zone       = element(split(",", var.azs), count.index)
+  # availability_zone       = element(split(",", var.azs), count.index)
   vpc_security_group_ids  = [aws_security_group.traefik.id]
 
   tags = {
     Name                  = var.name
     role                  = var.name
-  }
-
-  provisioner "remote-exec" {
-    connection {
-      host        = self.public_ip
-      user        = "ubuntu"
-      private_key = file("keys/${var.key_name}.pem")
-      timeout     = "15m"
-    }
-    inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard"
-    ]
   }
 }
 
@@ -34,16 +22,9 @@ data "template_file" "traefik_userdata" {
   vars = {
     BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
-    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
+    CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
     TRAEFIK_VERSION               = "v1.7.30"
-  }
-}
-
-data "template_file" "consul_install_snippet" {
-  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
-  vars = {
-    CONSUL_VERSION                = var.consul_version
   }
 }
 

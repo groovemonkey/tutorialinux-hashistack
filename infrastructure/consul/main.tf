@@ -5,7 +5,8 @@
 ###############################
 resource "aws_instance" "consul" {
   ami                     = var.ami
-  count                   = var.consul_cluster_size
+  # we always want 3 consul hosts, I've changed this to no longer be configurable
+  count                   = 3
   instance_type           = var.instance_type
   key_name                = var.key_name
 
@@ -15,7 +16,7 @@ resource "aws_instance" "consul" {
   #   availability_zone = var.azs[count.index % len(azs)]
   #
   # That way, you'll just loop over the subnets repeatedly and get an even distribution of instances
-  availability_zone       = element(split(",", var.azs), count.index)
+  # availability_zone       = element(split(",", var.azs), count.index)
   subnet_id               = var.subnet_id
   iam_instance_profile    = aws_iam_instance_profile.consul.name
   user_data               = data.template_file.consul_server_userdata.rendered
@@ -36,17 +37,10 @@ data "template_file" "consul_server_userdata" {
   vars = {
     BASE_PACKAGES_SNIPPET         = file("${path.module}/../shared_config/install_base_packages.sh")
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
-    CONSUL_INSTALL_SNIPPET        = data.template_file.consul_install_snippet.rendered
-    CONSUL_COUNT                  = var.consul_cluster_size
+    CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
   }
 }
 
-data "template_file" "consul_install_snippet" {
-  template = file("${path.module}/../shared_config/install_consul.sh.tpl")
-  vars = {
-    CONSUL_VERSION                = var.consul_version
-  }
-}
 
 ####################################################
 # A security group for our consul-server instances #
