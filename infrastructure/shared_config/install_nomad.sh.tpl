@@ -17,7 +17,9 @@ server {
 }
 client {
     enabled = true
-
+    template {
+        disable_file_sandbox = true
+    }
 }
 consul {
     address = "127.0.0.1:8500"

@@ -19,11 +19,16 @@ ${CONSUL_INSTALL_SNIPPET}
 
 ${NOMAD_INSTALL_SNIPPET}
 
-# install demo application
+${CONSUL_TPL_INSTALL_SNIPPET}
+
+# Install demo application
 cat <<EOF > "/etc/nomad.d/etherpad.jobspec"
 ${ETHERPAD_NOMAD_JOB_SNIPPET}
 EOF
 
-systemctl restart nomad
+# Write demo application settings file
+cat <<EOF > "/etc/nomad.d/etherpad-settings.json.tpl"
+${ETHERPAD_CONFIG_SNIPPET}
+EOF
 
 echo "Done with our user-data script!"

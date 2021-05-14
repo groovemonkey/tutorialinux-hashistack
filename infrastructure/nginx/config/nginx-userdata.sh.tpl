@@ -12,10 +12,7 @@ ${CONSUL_INSTALL_SNIPPET}
 
 ${CONSUL_CLIENT_CONFIG_SNIPPET}
 
-echo "Installing consul-template"
-wget https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
-unzip consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
-sudo cp consul-template /usr/local/bin/
+${CONSUL_TPL_INSTALL_SNIPPET}
 
 # Consul-template -- default systemd file requires vault??
 cat <<EOF > '/usr/lib/systemd/system/consul-template.service'

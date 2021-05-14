@@ -15,10 +15,10 @@ resource "aws_instance" "bastion" {
       host        = self.public_ip
       user        = "ubuntu"
       private_key = file("keys/${var.key_name}.pem")
-      timeout     = "15m"
+      timeout     = "5m"
     }
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard"
+      "sleep 30 && sudo apt-get update && sudo apt-get install -y sshguard"
     ]
   }
 }

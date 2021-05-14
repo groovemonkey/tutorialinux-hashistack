@@ -39,7 +39,9 @@ data "template_file" "nomad_server_userdata" {
     CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
     NOMAD_INSTALL_SNIPPET         = data.template_file.nomad_install_snippet.rendered
+    CONSUL_TPL_INSTALL_SNIPPET    = file("${path.module}/../shared_config/install_consul_template.sh")
     ETHERPAD_NOMAD_JOB_SNIPPET    = file("${path.module}/config/etherpad-nomad-svc.hcl")
+    ETHERPAD_CONFIG_SNIPPET       = file("${path.module}/config/etherpad-settings.json.tpl")
   }
 }
 

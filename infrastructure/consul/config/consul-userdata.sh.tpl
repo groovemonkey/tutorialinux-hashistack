@@ -26,8 +26,7 @@ cat <<EOF > "/etc/consul.d/consul.hcl"
 }
 EOF
 
-systemctl enable consul
-systemctl start consul
+systemctl restart consul
 
 # Could take a few seconds for consul to come up
 echo "Waiting for consul to come up..."

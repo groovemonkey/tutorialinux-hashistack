@@ -49,7 +49,7 @@ data "template_file" "nginx_userdata" {
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
     CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
-    CONSUL_TEMPLATE_VERSION       = var.consul_template_version
+    CONSUL_TPL_INSTALL_SNIPPET    = file("${path.module}/../shared_config/install_consul_template.sh")
   }
 }
 

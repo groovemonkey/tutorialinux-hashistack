@@ -52,11 +52,12 @@ module "traefik" {
 }
 
 # This instantiates an nginx host, running the consul agent and reading from the consul KV store
-module "nginx" {
-  source = "./nginx"
-  ami                       = var.base_ec2_ami
-  instance_type             = "t2.micro"
-  key_name                  = "tutorialinux"
-  subnet_id                 = aws_subnet.public.id
-  vpc_id                    = aws_vpc.tutorialinux.id
-}
+# switched off for now, to pursue traefik/nomad-service stuff
+// module "nginx" {
+//   source = "./nginx"
+//   ami                       = var.base_ec2_ami
+//   instance_type             = "t2.micro"
+//   key_name                  = "tutorialinux"
+//   subnet_id                 = aws_subnet.public.id
+//   vpc_id                    = aws_vpc.tutorialinux.id
+// }

@@ -6,6 +6,7 @@ resource "aws_instance" "traefik" {
   subnet_id               = var.public_subnet
   # availability_zone       = element(split(",", var.azs), count.index)
   vpc_security_group_ids  = [aws_security_group.traefik.id]
+  user_data               = data.template_file.traefik_userdata.rendered
 
   tags = {
     Name                  = var.name

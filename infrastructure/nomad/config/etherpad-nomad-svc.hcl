@@ -2,82 +2,17 @@ job "etherpad" {
   type = "service"
   datacenters = ["dc1"]
 
-  # A group defines a series of tasks that should be co-located
-  # on the same client (host). All tasks within a group will be
-  # placed on the same host.
-  group "web" {
-    # Specify the number of these tasks we want.
-    count = 2
-
-    network {
-      # This requests a dynamic port named "http". This will
-      # be something like "46283", but we refer to it via the
-      # label "http".
-      port "http" {}
-    }
-
-    # The service block tells Nomad how to register this service
-    # with Consul for service discovery and monitoring.
-    service {
-      name       = "etherpad"
-
-      # give this service a Consul tag so that traefik knows about it
-      tags = ["traefik.routers.etherpad"]
-
-      # This tells Consul to monitor the service on the port
-      # labelled "http". Since Nomad allocates high dynamic port
-      # numbers, we use labels to refer to them.
-      port = "http"
-
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    # Create an individual task (unit of work). This particular
-    # task utilizes a Docker container to front a web application.
-    task "etherpad" {
-      # Specify the driver to be "docker". Nomad supports
-      # multiple drivers.
-      driver = "docker"
-
-      # Configuration is specific to each driver.
-      config {
-        image = "etherpad/etherpad"
-        ports = ["http"]
-      }
-
-      # Set environment variables which will be available to the task when it runs.
-      env {
-        TITLE   = "tutorialinux etherpad"
-        DB_TYPE = "redis"
-        DB_HOST = "redis.service.consul"
-        DB_PORT = "6379"
-        DB_USER = ""
-        DB_PASS = ""
-      }
-
-      # Specify the maximum resources required to run the task,
-      # include CPU and memory.
-      resources {
-        cpu    = 300 # MHz
-        memory = 128 # MB
-      }
-    }
-  }
-
   group "redis" {
     count = 1
 
     network {
-      port "redis" { static = 6379 }
+      port "redis" {
+        to = 6379
+      }
     }
 
     service {
-      name = "redis"
+      name = "etherpad-redis"
       port = "redis"
       check {
         name     = "alive"
@@ -140,6 +75,70 @@ job "etherpad" {
       resources {
         cpu    = 200
         memory = 100
+      }
+    }
+  }
+
+  # A group defines a series of tasks that should be co-located
+  # on the same client (host). All tasks within a group will be
+  # placed on the same host.
+  group "web" {
+    # Specify the number of these tasks we want.
+    count = 2
+
+    network {
+      # This requests a dynamic port, mapped to a static port on the container
+      port "http" {
+        to = 9001
+      }
+    }
+
+    # The service block tells Nomad how to register this service
+    # with Consul for service discovery and monitoring.
+    service {
+      name       = "etherpad"
+
+      # give this service a Consul tag so that traefik knows about it
+      tags = ["traefik.routers.etherpad"]
+
+      # This tells Consul to monitor the service on the port
+      # labelled "http". Since Nomad allocates high dynamic port
+      # numbers, we use labels to refer to them.
+      port = "http"
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    # Create an individual task (unit of work). This particular
+    # task utilizes a Docker container to front a web application.
+    task "etherpad" {
+      # Specify the driver to be "docker". Nomad supports
+      # multiple drivers.
+      driver = "docker"
+
+      # Configuration is specific to each driver.
+      config {
+        image = "etherpad/etherpad"
+        ports = ["http"]
+      }
+
+      # Config template (uses consul-template, updates automagically when things change)
+      template {
+        source      = "/etc/nomad.d/etherpad-settings.json.tpl"
+        destination = "/opt/etherpad-lite/settings.json"
+        change_mode = "restart"
+      }
+
+      # Specify the maximum resources required to run the task,
+      # include CPU and memory.
+      resources {
+        cpu    = 300 # MHz
+        memory = 128 # MB
       }
     }
   }
