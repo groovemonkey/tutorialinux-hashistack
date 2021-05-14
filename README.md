@@ -37,7 +37,8 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 ### AWS Setup
 
 1. Create AWS Account, Log into AWS
-1. Create + download a keypair in AWS EC2
+1. Create + download a keypair named `tutorialinux.pem` in AWS EC2
+1. `cd $THIS_REPOSITORY/infrastructure`
 1. `chmod 600 ~/Downloads/tutorialinux.pem && mv ~/Downloads/tutorialinux.pem ./infrastructure/keys/`
 1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in keys/credentials.sh
 
@@ -71,12 +72,15 @@ ssh $CONSUL_IP
 This will forward ports from remote hosts through your bastion host onto your local (work) machine. You can then access the consul and nomad UIs as if you were running a local binary.
 
 1. Look up your bastion, consul, and nomad hosts' IPs (just one consul and nomad IP is fine):
+```
     export BASTION_HOST=1.2.3.4
     export CONSUL_SERVER=4.5.6.7
     export NOMAD_SERVER=6.7.8.9
-
+```
 1. Use ssh local forwarding to map those services' UI ports to your local machine
-    ssh -A ubuntu@$BASTION_HOST -L 8500:$CONSUL_SERVER:8500 -L 4646:$NOMAD_SERVER:4646
+```
+ssh -A ubuntu@$BASTION_HOST -L 8500:$CONSUL_SERVER:8500 -L 4646:$NOMAD_SERVER:4646
+```
 
 1. Now you can access those UIs locally!
 - Nomad http://localhost:4646/ui/jobs
