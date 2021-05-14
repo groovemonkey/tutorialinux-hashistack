@@ -7,5 +7,8 @@ sudo apt-get update && sudo apt-get install consul
 mkdir /var/lib/consul
 chown consul:consul /var/lib/consul
 
+# remove the default config file that the package managers added...
+rm /etc/consul.d/consul.hcl
+
 systemctl enable consul
 systemctl restart consul

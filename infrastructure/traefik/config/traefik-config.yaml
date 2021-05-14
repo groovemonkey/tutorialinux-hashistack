@@ -1,0 +1,10 @@
+providers:
+  consul:
+    endpoints:
+      - "127.0.0.1:8500"
+
+http:
+  routers:
+    etherpad-router:
+      rule: "Path(`/foo`)"
+      service: etherpad

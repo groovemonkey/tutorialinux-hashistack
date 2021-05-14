@@ -26,6 +26,7 @@ data "template_file" "traefik_userdata" {
     CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
     TRAEFIK_VERSION               = "v1.7.30"
+    TRAEFIK_CONFIG_SNIPPET        = file("${path.module}/config/traefik-config.yaml")
   }
 }
 
@@ -66,4 +67,51 @@ resource "aws_security_group" "traefik" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+
+################################################################
+# IAM Role & Instance Profile that lets us use cloud auto-join #
+################################################################
+resource "aws_iam_instance_profile" "traefik" {
+    name = "traefik"
+    role = aws_iam_role.traefik.name
+}
+
+resource "aws_iam_role_policy" "traefik" {
+    name = "traefik"
+    role = aws_iam_role.traefik.name
+    policy = <<EOF
+{
+    "Statement": [
+        {
+            "Sid": "consulautojoinfortraefik",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role" "traefik" {
+    name = "traefik"
+    path = "/"
+    assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
 }

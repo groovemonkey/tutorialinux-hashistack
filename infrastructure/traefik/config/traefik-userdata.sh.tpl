@@ -22,8 +22,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-# run traefik with consul provider enabled (passing command-line args is MUTUTALLY exclusive with a config file)
-ExecStart=/usr/local/bin/traefik --providers.consul
+ExecStart=/usr/local/bin/traefik
 
 Restart=on-failure
 ExecReload=/usr/bin/kill -HUP $MAINPID
@@ -32,6 +31,14 @@ KillSignal=SIGINT
 [Install]
 WantedBy=multi-user.target
 EOF
+
+
+# Add config file in default location
+mkdir /etc/traefik
+cat <<EOF > "/etc/traefik/traefik.yaml"
+${TRAEFIK_CONFIG_SNIPPET}
+EOF
+
 
 echo "Starting Traefik!"
 systemctl daemon-reload
