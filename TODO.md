@@ -1,25 +1,12 @@
 # TODO
 
 - move python clients into containers
-- run containers on nomad
-- set up traefik or fabio
 - serve traffic on the public Internet
 
 - move nginx into container on nomad
     - it's a great demo of a single-host webserver using consul, though
-- use auto-scaling groups for consul, nomad, and the consul-aware load balancer that I choose
-
-
-## FEATURE TODOs
-- service registration demo (little python program)
-    - Install and run it on the nginx instance?
-    - Create a systemd unit file to run the python app
-    - Create a service registration config file
-    - Create an HTTP health check file (should return 200)
-
-
-python ---> nginx LB (https://learn.hashicorp.com/consul/integrations/nginx-consul-template)
-    - or fabio? Traefik?
+- use auto-scaling groups for consul, nomad, and traefik
+- use an ELB for traefik
 
 - service discovery demo
     - HTTP
