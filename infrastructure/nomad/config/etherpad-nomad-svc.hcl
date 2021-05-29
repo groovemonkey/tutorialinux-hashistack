@@ -1,5 +1,5 @@
 job "etherpad" {
-  type = "service"
+  type        = "service"
   datacenters = ["dc1"]
 
   group "redis" {
@@ -31,10 +31,10 @@ job "etherpad" {
       # a task after it has failed.
       delay = "15s"
 
-     # The "mode" parameter controls what happens when a task has restarted
-     # "attempts" times within the interval. "delay" mode delays the next
-     # restart until the next interval. "fail" mode does not restart the task
-     # if "attempts" has been hit within the interval.
+      # The "mode" parameter controls what happens when a task has restarted
+      # "attempts" times within the interval. "delay" mode delays the next
+      # restart until the next interval. "fail" mode does not restart the task
+      # if "attempts" has been hit within the interval.
       mode = "delay"
     }
 
@@ -96,10 +96,13 @@ job "etherpad" {
     # The service block tells Nomad how to register this service
     # with Consul for service discovery and monitoring.
     service {
-      name       = "etherpad"
+      name = "etherpad"
 
       # give this service a Consul tag so that traefik knows about it
-      tags = ["traefik.routers.etherpad"]
+      tags = [
+        "traefik.routers.etherpad",
+        "traefik.enable=true",
+      ]
 
       # This tells Consul to monitor the service on the port
       # labelled "http". Since Nomad allocates high dynamic port
