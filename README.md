@@ -39,8 +39,12 @@ I also ended up making a simple VPC config that creates a new VPC, a public and 
 1. Create AWS Account, Log into AWS
 1. Create + download a keypair named `tutorialinux.pem` in AWS EC2
 1. `cd $THIS_REPOSITORY/infrastructure`
-1. `chmod 600 ~/Downloads/tutorialinux.pem && mv ~/Downloads/tutorialinux.pem ./infrastructure/keys/`
-1. Add an IAM user with programmatic access & administrator perms; save access key ID + secret key in keys/credentials.sh
+1. `mkdir keys`
+1. `chmod 600 ~/Downloads/tutorialinux.pem && mv ~/Downloads/tutorialinux.pem keys/`
+1. In the AWS console, add an IAM user with programmatic access & administrator perms; save access key ID + secret key in keys/credentials.sh in the following format:
+
+    export AWS_ACCESS_KEY_ID="yourawskeyid"
+    export AWS_SECRET_ACCESS_KEY="yoursecretkey"
 
 
 ### Infrastructure Creation
