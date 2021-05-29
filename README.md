@@ -91,6 +91,15 @@ ssh -A ubuntu@$BASTION_HOST -L 8500:$CONSUL_SERVER:8500 -L 4646:$NOMAD_SERVER:46
 - Consul http://localhost:8500/ui/tutorialinux/services
 
 
+### Run etherpad service on nomad
+
+1. ssh to a nomad server (via bastion)
+
+    nomad run /etc/nomad.d/etherpad.jobspec
+
+2. watch the deployment on the nomad UI or via `nomad status etherpad`
+
+
 ### Common troubleshooting tasks
 
 `Error: error configuring Terraform AWS Provider: no valid credential sources for Terraform AWS Provider found.`

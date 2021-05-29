@@ -18,8 +18,11 @@
 
 
 ## SMALL TODOs:
+- DNS is a little messed up - e.g. sudo -i takes really long because there's something that times out
+    sudo: unable to resolve host ip-10-0-10-172: Name or service not known
+
 - set hostnames (for shell prompt and consul)
-- add node names in each config (set hostname?)
+- add node names in each config (set hostname?) (not a small TODO actually)
 
 Nginx:
 - register nginx service with consul on startup (systemd unit file -- postexec?)
