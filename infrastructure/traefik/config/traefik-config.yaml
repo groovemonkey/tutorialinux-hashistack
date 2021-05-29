@@ -1,10 +1,37 @@
 providers:
-  consul:
-    endpoints:
-      - "127.0.0.1:8500"
+  consulCatalog:
+    exposedByDefault: false
+    prefix: traefik
+    endpoint:
+      address: 127.0.0.1:8500
+      datacenter: tutorialinux
 
-http:
-  routers:
-    etherpad-router:
-      rule: "Path(`/foo`)"
-      service: etherpad
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+  rule: "PathPrefix(\"/api\") || PathPrefix(\"/dashboard\")"
+
+
+log:
+  filePath: "/var/log/traefik.log"
+
+
+accessLog:
+  filePath: "/var/log/traefik_access.log"
+
+# not necessary (consul catalog)?
+# http:
+#   routers:
+#     etherpad-router:
+#       rule: "Path(\"/etherpad\")"
+#       service: etherpad
+
