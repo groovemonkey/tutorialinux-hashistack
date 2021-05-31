@@ -25,8 +25,8 @@ data "template_file" "traefik_userdata" {
     DNSMASQ_CONFIG_SNIPPET        = file("${path.module}/../shared_config/install_dnsmasq.sh")
     CONSUL_INSTALL_SNIPPET        = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET  = file("${path.module}/../shared_config/consul_client_config.sh")
-    TRAEFIK_VERSION               = "v1.7.30"
-    TRAEFIK_CONFIG_SNIPPET        = file("${path.module}/config/traefik-config.yaml")
+    TRAEFIK_STATIC_CONFIG_SNIPPET = file("${path.module}/config/traefik.yaml")
+    TRAEFIK_DYN_CONFIG_SNIPPET    = file("${path.module}/config/dynamic.yaml")
   }
 }
 

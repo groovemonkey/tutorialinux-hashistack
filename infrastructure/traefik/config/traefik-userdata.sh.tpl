@@ -4,8 +4,9 @@ set -eo pipefail
 ${BASE_PACKAGES_SNIPPET}
 
 echo "Installing traefik-role-specific packages..."
-wget https://github.com/traefik/traefik/releases/download/${TRAEFIK_VERSION}/traefik_linux-amd64
-cp traefik_linux-amd64 /usr/local/bin/traefik
+wget https://github.com/traefik/traefik/releases/download/v2.4.8/traefik_v2.4.8_linux_amd64.tar.gz
+tar -zxf traefik_v2.4.8_linux_amd64.tar.gz
+cp traefik /usr/local/bin/traefik
 chmod +x /usr/local/bin/traefik
 
 ${DNSMASQ_CONFIG_SNIPPET}
@@ -22,7 +23,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/traefik
+ExecStart=/usr/local/bin/traefik --configFile=/etc/traefik/traefik.yaml
 
 Restart=on-failure
 ExecReload=/usr/bin/kill -HUP $MAINPID
@@ -36,9 +37,12 @@ EOF
 # Add config file in default location
 mkdir /etc/traefik
 cat <<EOF > "/etc/traefik/traefik.yaml"
-${TRAEFIK_CONFIG_SNIPPET}
+${TRAEFIK_STATIC_CONFIG_SNIPPET}
 EOF
 
+cat <<EOF > "/etc/traefik/dynamic.yaml"
+${TRAEFIK_DYN_CONFIG_SNIPPET}
+EOF
 
 echo "Starting Traefik!"
 systemctl daemon-reload

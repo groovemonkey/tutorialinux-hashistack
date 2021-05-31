@@ -1,0 +1,7 @@
+http:
+  routers:
+    dashboard:
+      # TODO dave replace localhost with public IP via terraform output
+      rule: Host(`traefik.THISIP.nip.io`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+
