@@ -102,7 +102,7 @@ job "etherpad" {
       tags = [
         "traefik.enable=true",
         "traefik.connect=true",
-        "traefik.http.routers.etherpad.rule=Host(`etherpad.tutorialinux.com`)"
+        "traefik.http.routers.etherpad.rule=Host('etherpad.tutorialinux.com')"
       ]
 
       # This tells Consul to monitor the service on the port
