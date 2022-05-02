@@ -47,7 +47,7 @@ sleep 20
 
 # activate the Consul API on haproxy
 # TODO: there must be another way to activate this via config?
-curl -u dataplaneapitl:tlorganelementfeybruck \
+curl -u ${HAPROXY_DATAPLANE_USER}:${HAPROXY_DATAPLANE_PASSWORD} \
        -H 'Content-Type: application/json' \
        -d '{
              "address": "consul.service.consul",

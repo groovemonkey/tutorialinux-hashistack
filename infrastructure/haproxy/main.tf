@@ -27,9 +27,17 @@ data "template_file" "haproxy_userdata" {
     CONSUL_INSTALL_SNIPPET            = file("${path.module}/../shared_config/install_consul.sh")
     CONSUL_CLIENT_CONFIG_SNIPPET      = file("${path.module}/../shared_config/consul_client_config.sh")
     HAPROXY_MAIN_CONFIG_SNIPPET       = file("${path.module}/config/haproxy.cfg")
-    HAPROXY_DATAPLANE_CONFIG_SNIPPET  = file("${path.module}/config/dataplaneapi.yaml")
+    HAPROXY_DATAPLANE_CONFIG_SNIPPET  = data.template_file.haproxy_dataplane_config.rendered
     DATAPLANE_API_VERSION             = var.dataplaneAPIVersion
     HAPROXY_PPA_VERSION               = var.haproxyPPAVersion
+    HAPROXY_DATAPLANE_USER            = var.haproxy_dataplane_user
+    HAPROXY_DATAPLANE_PASSWORD        = var.haproxy_dataplane_password
+  }
+}
+
+data "template_file" "haproxy_dataplane_config" {
+  template = file("${path.module}/config/dataplaneapi.yaml.tpl")
+  vars = {
     HAPROXY_DATAPLANE_USER            = var.haproxy_dataplane_user
     HAPROXY_DATAPLANE_PASSWORD        = var.haproxy_dataplane_password
   }
