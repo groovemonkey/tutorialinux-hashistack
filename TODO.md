@@ -1,5 +1,11 @@
 # TODO
 
+- Add haproxy and replace traefik with it [apr 2022]
+    - resolve static port issue
+    - You can then access the API at port 5555. For example, in the demo project, http://192.168.50.20:5555/v2/docs will show you the API’s documentation. 
+
+- BUG/incomplete: there is no way that /etc/nginx/sites-available/tutorialinux-python is working (in nginx/config/nginx-userdata.sh.tpl)
+
 - move python clients into containers
 - serve traffic on the public Internet
 

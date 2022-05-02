@@ -114,7 +114,7 @@ Cloud-init scripts not running? Have a look at the cloud-init log, or tail (-f f
 `journalctl -fu cloud-init`
 
 If you get lost troubleshooting, check what your cloud-init script actually looks like when it's rendered on your instance as user-data:
-    - check  /var/lib/cloud/instances/ $INSTANCEID/ $YOUR_USER_DATA_STUFF
+    - cat /var/lib/cloud/instance/user-data.txt
 
 
 Consul:
