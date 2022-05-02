@@ -52,18 +52,18 @@ module "haproxy" {
 }
 
 # This creates a traefik host
-module "traefik" {
-  source = "./traefik"
-  ami                       = var.base_ec2_ami
-  instance_type             = "t2.micro"
-  # azs                       = "us-west-2a,us-west-2b,us-west-2c"
-  num_instances             = 1
-  key_name                  = "tutorialinux"
-  name                      = "traefik"
-  public_subnet             = aws_subnet.public.id
-  vpc_id                    = aws_vpc.tutorialinux.id
-  vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
-}
+# module "traefik" {
+#   source = "./traefik"
+#   ami                       = var.base_ec2_ami
+#   instance_type             = "t2.micro"
+#   # azs                       = "us-west-2a,us-west-2b,us-west-2c"
+#   num_instances             = 1
+#   key_name                  = "tutorialinux"
+#   name                      = "traefik"
+#   public_subnet             = aws_subnet.public.id
+#   vpc_id                    = aws_vpc.tutorialinux.id
+#   vpc_cidr                  = aws_vpc.tutorialinux.cidr_block
+# }
 
 # This instantiates an nginx host, running the consul agent and reading from the consul KV store
 # switched off for now, to pursue traefik/nomad-service stuff

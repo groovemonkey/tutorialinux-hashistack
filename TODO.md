@@ -1,19 +1,24 @@
 # TODO
 
 - Add haproxy and replace traefik with it [apr 2022]
-    - resolve static port issue
     - You can then access the API at port 5555. For example, in the demo project, http://192.168.50.20:5555/v2/docs will show you the API’s documentation. 
+    - is the dataplane API separate from the consul example that just uses DNS SRV records?
 
-- BUG/incomplete: there is no way that /etc/nginx/sites-available/tutorialinux-python is working (in nginx/config/nginx-userdata.sh.tpl)
-
-- move python clients into containers
-- serve traffic on the public Internet
+- 22.04 update
 
 - move nginx into container on nomad
     - it's a great demo of a single-host webserver using consul, though
 - use auto-scaling groups for consul, nomad, and traefik
 - use an ELB for traefik
 
+
+- BUG/incomplete: there is no way that /etc/nginx/sites-available/tutorialinux-python is working (in nginx/config/nginx-userdata.sh.tpl)
+
+- move python clients into containers
+- serve traffic on the public Internet
+
+
+## Demo Videos
 - service discovery demo
     - HTTP
 
