@@ -2,7 +2,7 @@
 module "bastion" {
   source = "./bastion"
   public_subnet             = aws_subnet.public.id
-  ami                       = var.data.aws_ami.ubuntu
+  ami                       = data.aws_ami.ubuntu
   instance_type             = "t2.micro"
   key_name                  = "tutorialinux"
   vpc_id                    = aws_vpc.tutorialinux.id
@@ -11,7 +11,7 @@ module "bastion" {
 # This creates a consul cluster
 module "consul" {
   source = "./consul"
-  ami                       = var.data.aws_ami.ubuntu
+  ami                       = data.aws_ami.ubuntu
   instance_type             = "t2.micro"
   # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   key_name                  = "tutorialinux"
@@ -26,7 +26,7 @@ module "consul" {
 # This creates a nomad cluster
 module "nomad" {
   source = "./nomad"
-  ami                       = var.data.aws_ami.ubuntu
+  ami                       = data.aws_ami.ubuntu
   instance_type             = "t2.micro"
   # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   nomad_cluster_size        = 3
@@ -40,7 +40,7 @@ module "nomad" {
 # This creates a haproxy host
 module "haproxy" {
   source = "./haproxy"
-  ami                       = var.data.aws_ami.ubuntu
+  ami                       = data.aws_ami.ubuntu
   instance_type             = "t2.micro"
   # azs                       = "us-west-2a,us-west-2b,us-west-2c"
   num_instances             = 1
@@ -54,7 +54,7 @@ module "haproxy" {
 # This creates a traefik host
 # module "traefik" {
 #   source = "./traefik"
-#   ami                       = var.data.aws_ami.ubuntu
+#   ami                       = data.aws_ami.ubuntu
 #   instance_type             = "t2.micro"
 #   # azs                       = "us-west-2a,us-west-2b,us-west-2c"
 #   num_instances             = 1
@@ -69,7 +69,7 @@ module "haproxy" {
 # switched off for now, to pursue traefik/nomad-service stuff
 // module "nginx" {
 //   source = "./nginx"
-//   ami                       = var.data.aws_ami.ubuntu
+//   ami                       = data.aws_ami.ubuntu
 //   instance_type             = "t2.micro"
 //   key_name                  = "tutorialinux"
 //   subnet_id                 = aws_subnet.public.id
