@@ -1,5 +1,5 @@
 resource "aws_instance" "nginx" {
-  ami                     = var.ami
+  ami                     = var.ami.id
   count                   = 1
   instance_type           = var.instance_type
   key_name                = var.key_name

@@ -1,5 +1,5 @@
 resource "aws_instance" "haproxy" {
-  ami                     = var.ami
+  ami                     = var.ami.id
   count                   = var.num_instances
   instance_type           = var.instance_type
   key_name                = var.key_name

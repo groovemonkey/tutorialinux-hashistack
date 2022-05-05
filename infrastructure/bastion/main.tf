@@ -1,5 +1,5 @@
 resource "aws_instance" "bastion" {
-  ami                     = var.ami
+  ami                     = var.ami.id
   instance_type           = var.instance_type
   key_name                = var.key_name
   subnet_id               = var.public_subnet
